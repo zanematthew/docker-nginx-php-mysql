@@ -8,4 +8,9 @@ class Foo
     {
         return 'Nginx PHP MySQL';
     }
+
+    public function foo_no(): bool 
+    {
+        return "true";
+    }
 }
