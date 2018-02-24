@@ -3,7 +3,7 @@
 .DS_Store
 
 # Application
-web/app/composer.json
+web/app/vendor
 
 # PHPStorm
 .idea/**/workspace.xml
