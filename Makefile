@@ -12,8 +12,11 @@ help:
 	@echo "Commands:"
 	@echo "  apidoc              Generate documentation of API"
 	@echo "  code-sniff          Check the API with PHP Code Sniffer (PSR2)"
+	@echo "  phpmd               The ever so annoying, but fun PHP Mess Detecor"
+	@echo "  phpcbf              Fix dat sh!t."
 	@echo "  clean               Clean directories for reset"
-	@echo "  composer-up         Update PHP dependencies with composer"
+	@echo "  composer-update     Update PHP dependencies with composer"
+	@echo "  composer-install    Install PHP dependencies with composer"
 	@echo "  docker-start        Create and start containers"
 	@echo "  docker-stop         Stop and clear all services"
 	@echo "  gen-certs           Generate SSL certificates"
@@ -42,8 +45,11 @@ code-sniff:
 	@echo "Checking the standard code..."
 	@docker-compose exec -T php ./app/vendor/bin/phpcs -v --standard=PSR2 app/src
 
-composer-up:
+composer-update:
 	@docker run --rm -v $(shell pwd)/web/app:/app composer update
+
+composer-install:
+	@docker run --rm -v $(shell pwd)/web/app:/app composer install
 
 docker-start: init
 	docker-compose up -d
@@ -72,5 +78,17 @@ test: code-sniff
 
 resetOwner:
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web/app" 2> /dev/null)
+
+phpmd:
+	@docker-compose exec -T php \
+		./app/vendor/bin/phpmd \
+		app/src/ \
+		text \
+		cleancode,codesize,controversial,design,naming,unusedcode
+
+phpcbf:
+	@docker-compose exec -T php \
+		./app/vendor/bin/phpcbf \
+		app/src/
 
 .PHONY: clean test code-sniff init
