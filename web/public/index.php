@@ -2,6 +2,7 @@
 
 include '../app/vendor/autoload.php';
 $foo = new App\Acme\Foo();
+$connection = new App\Acme\Connection();
 
 ?><!DOCTYPE html>
 <html>
@@ -10,6 +11,7 @@ $foo = new App\Acme\Foo();
         <title>Docker <?php echo $foo->getName(); ?></title>
     </head>
     <body>
-        <h1>Docker <?php echo $foo->getName(); ?></h1>
+        <h1>Docker <?php echo $foo->noName(); ?></h1>
+        <h1>MySQL: <?php echo $connection->connect(); ?></h1>
     </body>
 </html>

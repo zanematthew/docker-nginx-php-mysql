@@ -4,13 +4,19 @@ namespace App\Acme;
 
 class Foo
 {
-    public function getName()
+    /**
+     * Ayyiyah
+     *
+     * @param  boolean $wow Yep, thats it.
+     * @return bool         wtf
+     */
+    public function getName($wow = true): bool
     {
         return 'Nginx PHP MySQL';
     }
 
-    public function foo_no(): bool 
+    public function noName()
     {
-        return "true";
+        return 'no name';
     }
 }
