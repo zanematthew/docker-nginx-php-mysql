@@ -43,13 +43,13 @@ clean:
 
 code-sniff:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./app/vendor/bin/phpcs -v --standard=PSR2 app/src
+	@docker-compose exec -T php ./vendor/bin/phpcs -v --standard=PSR2 app
 
 composer-update:
-	@docker run --rm -v $(shell pwd)/web/app:/app composer update
+	@docker run --rm -v $(shell pwd)/web:/app composer update
 
 composer-install:
-	@docker run --rm -v $(shell pwd)/web/app:/app composer install
+	@docker run --rm -v $(shell pwd)/web:/app composer install
 
 docker-start: init
 	docker-compose up -d
