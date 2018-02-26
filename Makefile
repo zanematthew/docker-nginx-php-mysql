@@ -81,8 +81,8 @@ resetOwner:
 
 phpmd:
 	@docker-compose exec -T php \
-		./app/vendor/bin/phpmd \
-		app/src/ \
+		./vendor/bin/phpmd \
+		app/ \
 		text \
 		cleancode,codesize,controversial,design,naming,unusedcode
 
