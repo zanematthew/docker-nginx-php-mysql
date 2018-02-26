@@ -22,24 +22,24 @@ class ShovelEventIdByType extends AbstractShovelClient
         $sectionId = $this->eventTypes[$type]['section_id'];
 
         switch ($sectionId) {
-        case 228:
-            $additionalParams = ['category' => strtoupper($type)];
-            break;
-        case 95:
-            $additionalParams = ['series_race_type' => $type];
-            break;
-        case 24:
-            $additionalParams = ['goldcup' => 1];
-            break;
-        case 19:
-            $additionalParams = ['series_race_type' => $type];
-            break;
-        case 23:
-            $additionalParams = ['filter_state' => 1];
-            break;
-        default:
-            $additionalParams = null;
-            break;
+            case 228:
+                $additionalParams = ['category' => strtoupper($type)];
+                break;
+            case 95:
+                $additionalParams = ['series_race_type' => $type];
+                break;
+            case 24:
+                $additionalParams = ['goldcup' => 1];
+                break;
+            case 19:
+                $additionalParams = ['series_race_type' => $type];
+                break;
+            case 23:
+                $additionalParams = ['filter_state' => 1];
+                break;
+            default:
+                $additionalParams = null;
+                break;
         }
 
         $yearFix = $year;
@@ -59,7 +59,8 @@ class ShovelEventIdByType extends AbstractShovelClient
                 'year'       => $yearFix,
                 'past_only'  => $pastOnly,
                 'page'       => empty($page) ? 1 : $page,
-                ], $additionalParams
+                ],
+                $additionalParams
             )
         );
     }
@@ -75,7 +76,8 @@ class ShovelEventIdByType extends AbstractShovelClient
         return array_map(
             function ($link) {
                 return (int) explode('/', explode('?', $link)[0])[3];
-            }, $links
+            },
+            $links
         );
     }
 

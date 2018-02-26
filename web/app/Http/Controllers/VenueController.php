@@ -19,7 +19,8 @@ class VenueController extends Controller
             $states = explode(',', request('states'));
 
             $q->whereHas(
-                'city.states', function ($query) use ($states) {
+                'city.states',
+                function ($query) use ($states) {
                     $query->whereIn('abbr', $states);
                 }
             );
@@ -48,7 +49,8 @@ class VenueController extends Controller
     public function state($state = null)
     {
         return \App\Venue::with('city.states', 'events')->whereHas(
-            'city.states', function ($query) use ($state) {
+            'city.states',
+            function ($query) use ($state) {
                 $query->where('abbr', strtoupper($state));
             }
         )->paginate($this->paginate);
@@ -62,7 +64,8 @@ class VenueController extends Controller
     public function events($venueId = null)
     {
         return \App\Event::where('venue_id', $venueId)->whereBetween(
-            'start_date', [
+            'start_date',
+            [
             date('Y-m-d', strtotime('today')),
             date('Y-m-d', strtotime('last day of this month')),
             ]

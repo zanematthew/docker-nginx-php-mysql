@@ -107,18 +107,18 @@ class LibraryController extends Controller
     public function typeToFqc($type = null): string
     {
         switch ($type) {
-        case 'event':
-            $modelFqc = 'App\Event';
-            break;
-        case 'venue';
-            $modelFqc = 'App\Venue';
-            break;
-        case 'schedule';
-            $modelFqc = 'App\Schedule';
-            break;
-        default:
-            $modelFqc = '';
-            break;
+            case 'event':
+                $modelFqc = 'App\Event';
+                break;
+            case 'venue';
+                $modelFqc = 'App\Venue';
+                break;
+            case 'schedule';
+                $modelFqc = 'App\Schedule';
+                break;
+            default:
+                $modelFqc = '';
+                break;
         }
         return $modelFqc;
     }

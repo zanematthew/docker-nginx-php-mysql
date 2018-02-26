@@ -72,7 +72,8 @@ class ShovelRequestBulkEventByPageCommand extends Command
             $startMonthIterator = $startMonth;
             while ($startMonthIterator <= $endMonth) {
                 $exitCode = $this->call(
-                    'shovel:request-events-by-page', [
+                    'shovel:request-events-by-page',
+                    [
                     '--venue_id' => $content['venue_id'],
                     '--page_id'  => $content['page_id'],
                     '--month'    => $startMonthIterator,
@@ -92,7 +93,9 @@ class ShovelRequestBulkEventByPageCommand extends Command
 
         $contentsStillToProcess = array_values(
             array_udiff(
-                $contents, $contentsToProcess, function ($a, $b) {
+                $contents,
+                $contentsToProcess,
+                function ($a, $b) {
                     return $a['page_id'] - $b['page_id'];
                 }
             )
@@ -119,6 +122,5 @@ class ShovelRequestBulkEventByPageCommand extends Command
             )
         );
         $this->line("----------------------------------------------------------------");
-
     }
 }

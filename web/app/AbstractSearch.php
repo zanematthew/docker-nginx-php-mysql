@@ -41,7 +41,8 @@ abstract class AbstractSearch extends Controller
                         return array_merge($item['_source'], $this->getExtraFields($item));
                     }
                     return $item['_source'];
-                }, $response['hits']['hits']
+                },
+                $response['hits']['hits']
             );
         }
         return $hits;

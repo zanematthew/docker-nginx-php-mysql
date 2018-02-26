@@ -49,7 +49,8 @@ class ShovelEventsSchedule extends AbstractShovelClient
                 }
 
                 $date = date(
-                    'Y-m-d', strtotime(
+                    'Y-m-d',
+                    strtotime(
                         sprintf(
                             '%d-%d-%d',
                             $this->year,
@@ -72,7 +73,8 @@ class ShovelEventsSchedule extends AbstractShovelClient
                         if ($node->filter('p')->count() == 1) {
                             $contentsArray = array_filter(
                                 explode(
-                                    '<br>', str_replace(
+                                    '<br>',
+                                    str_replace(
                                         ['<p>','</p>'],
                                         '',
                                         $this->aggressiveTrim($node->filter('p')->html())
@@ -107,7 +109,8 @@ class ShovelEventsSchedule extends AbstractShovelClient
                     } else {
                         $event['registration_start_time'] = $this->timeFormat(
                             $this->wtfTimeFix(
-                                $event['registration-start'], $event['type']
+                                $event['registration-start'],
+                                $event['type']
                             )
                         );
                         unset($event['registration-start']);
@@ -118,7 +121,8 @@ class ShovelEventsSchedule extends AbstractShovelClient
                     } else {
                         $event['registration_end_time'] = $this->timeFormat(
                             $this->wtfTimeFix(
-                                $event['registration-end'], $event['type']
+                                $event['registration-end'],
+                                $event['type']
                             )
                         );
                         unset($event['registration-end']);
@@ -129,7 +133,8 @@ class ShovelEventsSchedule extends AbstractShovelClient
                     $event['usabmx_venue_id'] = $this->venueId;
 
                     return $event;
-                }, $event
+                },
+                $event
             );
             $cleanedEvents[] = $event;
         }
@@ -144,7 +149,9 @@ class ShovelEventsSchedule extends AbstractShovelClient
                 '$',
                 'USD',
                 ' ',
-            ], '', $fee
+            ],
+            '',
+            $fee
         );
 
         preg_match('/[a-z]/i', $fee, $matches);
@@ -165,7 +172,7 @@ class ShovelEventsSchedule extends AbstractShovelClient
         if ($matches) {
             $time = str_replace('M', 'PM', $time);
         } elseif (in_array(strtolower($eventType), ['practice', 'clinic'])
-            && ! str_contains($time, ['M', 'PM']) 
+            && ! str_contains($time, ['M', 'PM'])
         ) {
             $time = $time .'PM';
         }
@@ -176,7 +183,7 @@ class ShovelEventsSchedule extends AbstractShovelClient
     {
         $events = $this->events();
         $total  = 0;
-        foreach ($events as $event){
+        foreach ($events as $event) {
             $total += count($event);
         }
         return $total;

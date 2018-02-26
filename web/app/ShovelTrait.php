@@ -126,8 +126,8 @@ trait ShovelTrait
         return $price * 100;
     }
 
-    public function timeFormat($time = null): string 
-    {        
+    public function timeFormat($time = null): string
+    {
         return date('H:i', strtotime($time));
     }
 }

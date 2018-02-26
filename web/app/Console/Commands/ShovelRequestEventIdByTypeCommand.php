@@ -112,7 +112,8 @@ class ShovelRequestEventIdByTypeCommand extends Command
             ];
 
             $results = array_merge(
-                $results, [
+                $results,
+                [
                 'max_page' => $maxPage,
                 'events'   => $events
                 ]

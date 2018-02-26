@@ -22,7 +22,8 @@ class EventController extends Controller
         if (request('state')) {
             $state = request('state');
             $q = $q->whereHas(
-                'venue.city.states', function ($query) use ($state) {
+                'venue.city.states',
+                function ($query) use ($state) {
                     $query->where('abbr', strtoupper($state));
                 }
             );
@@ -31,7 +32,8 @@ class EventController extends Controller
         if (request('states')) {
             $states = request('states');
             $q = $q->whereHas(
-                'venue.city.states', function ($query) use ($states) {
+                'venue.city.states',
+                function ($query) use ($states) {
                     $states = explode(',', strtoupper($states));
                     $query->whereIn('abbr', $states);
                 }
@@ -40,14 +42,16 @@ class EventController extends Controller
 
         if (request('next_month') == true) {
             $q = $q->whereBetween(
-                'start_date', [
+                'start_date',
+                [
                 date('Y-m-d', strtotime('first day of next month')),
                 date('Y-m-d', strtotime('last day of next month')),
                 ]
             );
         } elseif (request('this_month') == true) {
             $q = $q->whereBetween(
-                'start_date', [
+                'start_date',
+                [
                 date('Y-m-d', strtotime('today')),
                 date('Y-m-d', strtotime('last day of this month')),
                 ]
@@ -88,7 +92,8 @@ class EventController extends Controller
     {
         $q = \App\Event::with('venue.city.states')
             ->whereHas(
-                'venue.city.states', function ($query) use ($state) {
+                'venue.city.states',
+                function ($query) use ($state) {
                     $query->where('abbr', strtoupper($state));
                 }
             );
@@ -179,7 +184,8 @@ class EventController extends Controller
     {
         return \App\Event::with('venue.city.states')
             ->whereHas(
-                'venue.city.states', function ($query) use ($state) {
+                'venue.city.states',
+                function ($query) use ($state) {
                     $query->where('abbr', strtoupper($state));
                 }
             )
@@ -201,7 +207,8 @@ class EventController extends Controller
     {
         return \App\Event::with('venue.city.states')
             ->whereHas(
-                'venue.city.states', function ($query) use ($state) {
+                'venue.city.states',
+                function ($query) use ($state) {
                     $query->where('abbr', strtoupper($state));
                 }
             )
@@ -224,7 +231,8 @@ class EventController extends Controller
     {
         return \App\Event::with('venue.city.states')
             ->whereHas(
-                'venue.city.states', function ($query) use ($state) {
+                'venue.city.states',
+                function ($query) use ($state) {
                     $query->where('abbr', strtoupper($state));
                 }
             )
@@ -248,7 +256,8 @@ class EventController extends Controller
     {
         return \App\Event::with('venue.city.states')
                 ->whereHas(
-                    'venue.city.states', function ($query) use ($state) {
+                    'venue.city.states',
+                    function ($query) use ($state) {
                         $query->where('abbr', strtoupper($state));
                     }
                 )

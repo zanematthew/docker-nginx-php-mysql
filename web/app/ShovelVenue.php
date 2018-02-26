@@ -97,7 +97,8 @@ class ShovelVenue extends AbstractShovelClient
         }
 
         return array_map(
-            'strip_tags', [
+            'strip_tags',
+            [
             'street'    => $street,
             'city'      => $city,
             'stateAbbr' => strtoupper($state),
@@ -173,7 +174,8 @@ class ShovelVenue extends AbstractShovelClient
     public function parseDescription(): string
     {
         return implode(
-            ' ', $this->filter('#track_contact p')->each(
+            ' ',
+            $this->filter('#track_contact p')->each(
                 function ($node) {
                     return $node->text();
                 }

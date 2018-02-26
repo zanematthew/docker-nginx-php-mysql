@@ -38,7 +38,8 @@ class SearchPlaceController extends AbstractSearch implements SearchInterface
     public function proximity($latlon): \Illuminate\Http\JsonResponse
     {
         $results = Venue::search(
-            '', function ($engine, $query, $options) use ($latlon) {
+            '',
+            function ($engine, $query, $options) use ($latlon) {
                 $options['body']['sort']['_geo_distance'] = [
                 'latlon'        => $latlon,
                 'order'         => 'asc',
@@ -55,6 +56,5 @@ class SearchPlaceController extends AbstractSearch implements SearchInterface
 
     public function textProximity($text, $latlon): \Illuminate\Http\JsonResponse
     {
-
     }
 }

@@ -66,7 +66,8 @@ class ShovelRequestDetailBulkCommand extends Command
                         if (str_contains($dirFile, '.json')) {
                             return $dirFile;
                         }
-                    }, Storage::files($bulkDir)
+                    },
+                    Storage::files($bulkDir)
                 )
             )
         );

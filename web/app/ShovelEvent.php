@@ -93,7 +93,7 @@ class ShovelEvent extends AbstractShovelClient
 
         $tmp = [];
         // TODO figure out why the array returned is nested(?)
-        foreach ($resources as $r){
+        foreach ($resources as $r) {
             foreach ($r as $k => $v) {
                 $tmp[$k] = $v;
             }
