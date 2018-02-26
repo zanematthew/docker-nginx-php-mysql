@@ -59,11 +59,17 @@ class ShovelRequestDetailBulkCommand extends Command
         $bulkDir = "public/{$dir}/bulk/";
 
         // Handle venues OR events
-        $bulkIdsJsonfile = array_values(array_filter(array_map(function ($dirFile) {
-            if (str_contains($dirFile, '.json')) {
-                return $dirFile;
-            }
-        }, Storage::files($bulkDir))));
+        $bulkIdsJsonfile = array_values(
+            array_filter(
+                array_map(
+                    function ($dirFile) {
+                        if (str_contains($dirFile, '.json')) {
+                            return $dirFile;
+                        }
+                    }, Storage::files($bulkDir)
+                )
+            )
+        );
         $fileToProcess = $this->option('file') ?? $this->choice('Select a file to process?', $bulkIdsJsonfile);
 
         if (empty($bulkIdsJsonfile)) {

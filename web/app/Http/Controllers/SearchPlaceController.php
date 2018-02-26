@@ -19,11 +19,13 @@ class SearchPlaceController extends AbstractSearch implements SearchInterface
      */
     public function text($text): \Illuminate\Http\JsonResponse
     {
-        return response()->json(Venue::search($text)
+        return response()->json(
+            Venue::search($text)
             ->where('z_type', 'venue')
             ->take($this->take)
             ->get()
-            ->load('city.states'));
+            ->load('city.states')
+        );
     }
 
     /**
@@ -35,16 +37,18 @@ class SearchPlaceController extends AbstractSearch implements SearchInterface
      */
     public function proximity($latlon): \Illuminate\Http\JsonResponse
     {
-        $results = Venue::search('', function ($engine, $query, $options) use ($latlon) {
-            $options['body']['sort']['_geo_distance'] = [
+        $results = Venue::search(
+            '', function ($engine, $query, $options) use ($latlon) {
+                $options['body']['sort']['_geo_distance'] = [
                 'latlon'        => $latlon,
                 'order'         => 'asc',
                 'unit'          => 'mi',
                 'mode'          => 'min',
                 'distance_type' => 'arc',
-            ];
-            return $engine->search($options);
-        })->where('z_type', 'venue')->take($this->take)->get()->load('city.states');
+                ];
+                return $engine->search($options);
+            }
+        )->where('z_type', 'venue')->take($this->take)->get()->load('city.states');
 
         return response()->json($results);
     }

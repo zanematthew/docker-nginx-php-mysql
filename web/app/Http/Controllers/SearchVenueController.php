@@ -18,34 +18,46 @@ class SearchVenueController extends AbstractSearch
      */
     public function phrase(Request $request): \Illuminate\Http\JsonResponse
     {
-        list($lat, $lon) = explode(',' , $request->latlon);
-        return response()->json($this->formatResults(\Elasticsearch::searchTemplate([
-            'body' => [
-                'id' => 'venue-phrase',
-                'params' => [
+        list($lat, $lon) = explode(',', $request->latlon);
+        return response()->json(
+            $this->formatResults(
+                \Elasticsearch::searchTemplate(
+                    [
+                    'body' => [
+                    'id' => 'venue-phrase',
+                    'params' => [
                     'phrase'   => $request->text,
                     'lat'      => $lat,
                     'lon'      => $lon,
                     'latlon'   => $request->latlon,
                     'distance' => 250,
-                ]
-            ]
-        ])));
+                    ]
+                    ]
+                    ]
+                )
+            )
+        );
     }
 
     public function suggestion(Request $request): \Illuminate\Http\JsonResponse
     {
-        list($lat, $lon) = explode(',' , $request->latlon);
-        return response()->json($this->formatResults(\Elasticsearch::searchTemplate([
-            'body' => [
-                'id' => 'venue-suggest',
-                'params' => [
+        list($lat, $lon) = explode(',', $request->latlon);
+        return response()->json(
+            $this->formatResults(
+                \Elasticsearch::searchTemplate(
+                    [
+                    'body' => [
+                    'id' => 'venue-suggest',
+                    'params' => [
                     'lat'      => $lat,
                     'lon'      => $lon,
                     'latlon'   => $request->latlon,
                     'distance' => 250,
-                ]
-            ]
-        ])));
+                    ]
+                    ]
+                    ]
+                )
+            )
+        );
     }
 }

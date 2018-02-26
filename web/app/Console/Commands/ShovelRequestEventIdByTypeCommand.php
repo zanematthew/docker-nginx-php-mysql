@@ -111,10 +111,12 @@ class ShovelRequestEventIdByTypeCommand extends Command
                 'ids'      => $ids,
             ];
 
-            $results = array_merge($results, [
+            $results = array_merge(
+                $results, [
                 'max_page' => $maxPage,
                 'events'   => $events
-            ]);
+                ]
+            );
 
             // maybe doWhile(?)
             // Check the current page against the actual max page
@@ -147,11 +149,13 @@ class ShovelRequestEventIdByTypeCommand extends Command
         foreach ($results['events'] as $eventInfo) {
             $this->info("Page: {$eventInfo['page']}");
             $this->info("URL: {$eventInfo['url']}");
-            $this->info(sprintf(
-                "Event IDs (%d):\n%s",
-                $eventInfo['count'],
-                implode(',', $eventInfo['ids'])
-            ));
+            $this->info(
+                sprintf(
+                    "Event IDs (%d):\n%s",
+                    $eventInfo['count'],
+                    implode(',', $eventInfo['ids'])
+                )
+            );
             $this->line("\n");
         }
 

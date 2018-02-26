@@ -22,24 +22,24 @@ class ShovelEventIdByType extends AbstractShovelClient
         $sectionId = $this->eventTypes[$type]['section_id'];
 
         switch ($sectionId) {
-            case 228:
-                $additionalParams = ['category' => strtoupper($type)];
-                break;
-            case 95:
-                $additionalParams = ['series_race_type' => $type];
-                break;
-            case 24:
-                $additionalParams = ['goldcup' => 1];
-                break;
-            case 19:
-                $additionalParams = ['series_race_type' => $type];
-                break;
-            case 23:
-                $additionalParams = ['filter_state' => 1];
-                break;
-            default:
-                $additionalParams = null;
-                break;
+        case 228:
+            $additionalParams = ['category' => strtoupper($type)];
+            break;
+        case 95:
+            $additionalParams = ['series_race_type' => $type];
+            break;
+        case 24:
+            $additionalParams = ['goldcup' => 1];
+            break;
+        case 19:
+            $additionalParams = ['series_race_type' => $type];
+            break;
+        case 23:
+            $additionalParams = ['filter_state' => 1];
+            break;
+        default:
+            $additionalParams = null;
+            break;
         }
 
         $yearFix = $year;
@@ -52,29 +52,41 @@ class ShovelEventIdByType extends AbstractShovelClient
             $pastOnly = 1;
         }
 
-        return 'https://www.usabmx.com/site/bmx_races?' . http_build_query(array_merge([
-            'section_id' => $sectionId,
-            'year'       => $yearFix,
-            'past_only'  => $pastOnly,
-            'page'       => empty($page) ? 1 : $page,
-        ], $additionalParams));
+        return 'https://www.usabmx.com/site/bmx_races?' . http_build_query(
+            array_merge(
+                [
+                'section_id' => $sectionId,
+                'year'       => $yearFix,
+                'past_only'  => $pastOnly,
+                'page'       => empty($page) ? 1 : $page,
+                ], $additionalParams
+            )
+        );
     }
 
     public function eventIds(): array
     {
-        $links = $this->filter('.event_title')->each(function ($node) {
-            return $node->filter('a')->eq(0)->attr('href');
-        });
+        $links = $this->filter('.event_title')->each(
+            function ($node) {
+                return $node->filter('a')->eq(0)->attr('href');
+            }
+        );
 
-        return array_map(function ($link) {
-            return (int) explode('/', explode('?', $link)[0])[3];
-        }, $links);
+        return array_map(
+            function ($link) {
+                return (int) explode('/', explode('?', $link)[0])[3];
+            }, $links
+        );
     }
 
     public function maxPage(): int
     {
-        return max($this->filter('.pagination li')->each(function ($node) {
-            return (int) $node->filter('li')->text();
-        }));
+        return max(
+            $this->filter('.pagination li')->each(
+                function ($node) {
+                    return (int) $node->filter('li')->text();
+                }
+            )
+        );
     }
 }

@@ -27,7 +27,6 @@ namespace App;
  * https://github.com/elastic/elasticsearch-php/issues/686#issuecomment-348212032
  * https://www.freeformatter.com/json-escape.html
  * http://jsonviewer.stack.hu/
- *
  */
 class ElasticsearchSearchTemplates
 {

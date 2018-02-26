@@ -43,7 +43,9 @@ class ShovelEvent extends AbstractShovelClient
     }
 
     // Most events just say "There is no description for this race."
-    public function description(){}
+    public function description()
+    {
+    }
 
     public function venueId(): int
     {
@@ -82,10 +84,12 @@ class ShovelEvent extends AbstractShovelClient
 
     public function parseResource($resource = null): string
     {
-        $resources = $this->filter('.race_resources li')->each(function ($node) use ($resource) {
-            // Note, can't use `snake_case()`, because that makes BMX into b_m_x
-            return [str_replace(' ', '_', strtolower($node->text())) => $node->filter('a')->attr('href')];
-        });
+        $resources = $this->filter('.race_resources li')->each(
+            function ($node) use ($resource) {
+                // Note, can't use `snake_case()`, because that makes BMX into b_m_x
+                return [str_replace(' ', '_', strtolower($node->text())) => $node->filter('a')->attr('href')];
+            }
+        );
 
         $tmp = [];
         // TODO figure out why the array returned is nested(?)
@@ -124,9 +128,11 @@ class ShovelEvent extends AbstractShovelClient
             return '';
         }
 
-        $textArray = $this->filter('#event_description li')->each(function ($node) use ($text) {
-            return $node->filter('li')->text();
-        });
+        $textArray = $this->filter('#event_description li')->each(
+            function ($node) use ($text) {
+                return $node->filter('li')->text();
+            }
+        );
 
         $found = null;
         foreach ($textArray as $item) {

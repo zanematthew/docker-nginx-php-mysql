@@ -51,7 +51,7 @@ class ShovelRequestBulkEventByPageCommand extends Command
         } else {
             $startMonth = $endMonth = $monthRange;
         }
-        if ($startMonth < 1 && $startMonth > 12 || $endMonth < 1 && $endMonth){
+        if ($startMonth < 1 && $startMonth > 12 || $endMonth < 1 && $endMonth) {
             $this->error("Invalid month range: {$monthRange}.");
             return false;
         }
@@ -71,13 +71,15 @@ class ShovelRequestBulkEventByPageCommand extends Command
             $this->comment("Processing ({$i} of {$itemsAvailableCount}), Venue ID: {$content['venue_id']}, Page ID: {$content['page_id']}");
             $startMonthIterator = $startMonth;
             while ($startMonthIterator <= $endMonth) {
-                $exitCode = $this->call('shovel:request-events-by-page', [
+                $exitCode = $this->call(
+                    'shovel:request-events-by-page', [
                     '--venue_id' => $content['venue_id'],
                     '--page_id'  => $content['page_id'],
                     '--month'    => $startMonthIterator,
                     '--year'     => 2017,
                     '--save'     => true,
-                ]);
+                    ]
+                );
                 $exitCode = true;
                 $this->comment("Start month: {$startMonthIterator} end month: {$endMonth}");
                 if ($exitCode == 1) {
@@ -88,7 +90,13 @@ class ShovelRequestBulkEventByPageCommand extends Command
             $i++;
         }
 
-        $contentsStillToProcess = array_values(array_udiff($contents, $contentsToProcess, function($a, $b){ return $a['page_id'] - $b['page_id'];}));
+        $contentsStillToProcess = array_values(
+            array_udiff(
+                $contents, $contentsToProcess, function ($a, $b) {
+                    return $a['page_id'] - $b['page_id'];
+                }
+            )
+        );
         $contentsStillToProcessCount = count($contentsStillToProcess);
         $itemsProcessedCount = count($itemsProcessed);
 
@@ -102,11 +110,14 @@ class ShovelRequestBulkEventByPageCommand extends Command
         $this->info("Number of items available to process: {$itemsAvailableCount}");
         $this->info("Number of items processed: {$itemsProcessedCount}");
         $this->info("Number of items left to process: {$contentsStillToProcessCount}");
-        $this->info(sprintf('Start Time: %s, End Time: %s, Duration: %s',
-            date('H:i:s', $startTime),
-            date('H:i:s', $endTime),
-            gmdate('i:s', $endTime - $startTime)
-        ));
+        $this->info(
+            sprintf(
+                'Start Time: %s, End Time: %s, Duration: %s',
+                date('H:i:s', $startTime),
+                date('H:i:s', $endTime),
+                gmdate('i:s', $endTime - $startTime)
+            )
+        );
         $this->line("----------------------------------------------------------------");
 
     }

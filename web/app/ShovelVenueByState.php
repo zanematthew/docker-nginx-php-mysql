@@ -28,8 +28,10 @@ class ShovelVenueByState extends AbstractShovelClient
      */
     public function parseVenueId(): array
     {
-        return $this->filter('#track_results li')->each(function ($node) {
-            return (int)explode('?', explode('/', $node->filter('.track_title a')->attr('href'))[3])[0];
-        });
+        return $this->filter('#track_results li')->each(
+            function ($node) {
+                return (int)explode('?', explode('/', $node->filter('.track_title a')->attr('href'))[3])[0];
+            }
+        );
     }
 }

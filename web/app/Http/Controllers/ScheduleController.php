@@ -12,7 +12,8 @@ class ScheduleController extends Controller
 
     public function index(): \Illuminate\Http\JsonResponse
     {
-        return response()->json(Auth::user()
+        return response()->json(
+            Auth::user()
             ->schedules()
             ->where('name', '!=', 'Master')
             ->with('events.venue.city.states') // @todo needs updated test
@@ -27,7 +28,7 @@ class ScheduleController extends Controller
         $schedule->user()->associate(Auth::user());
         $schedule->save();
 
-        return response()->json(array_merge($schedule->getAttributes(),['events' => []]));
+        return response()->json(array_merge($schedule->getAttributes(), ['events' => []]));
     }
 
     public function update(Request $request): \Illuminate\Http\JsonResponse
@@ -50,10 +51,12 @@ class ScheduleController extends Controller
         // @todo find away not to make another request here.
         $event = \App\Event::find($request->eventId);
 
-        return response()->json([
+        return response()->json(
+            [
             'attached' => $toggled['attached'] ? $event : false,
             'detached' => $toggled['detached'] ? $event : false,
-        ]);
+            ]
+        );
     }
 
     public function delete(Request $request): \Illuminate\Http\JsonResponse
@@ -71,7 +74,8 @@ class ScheduleController extends Controller
 
     public function events(Request $request): \Illuminate\Http\JsonResponse
     {
-        return response()->json(Auth::user()
+        return response()->json(
+            Auth::user()
             ->schedules()
             ->find($request->id)
             ->events()

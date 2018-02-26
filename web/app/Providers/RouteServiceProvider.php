@@ -24,7 +24,8 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         //
-        Route::patterns([
+        Route::patterns(
+            [
             'state' => '[a-zA-Z]{2}',
             'type'  => '[a-z]+(?:-[a-z]+)*$',
             'year'  => '^\d{4}$',
@@ -32,7 +33,8 @@ class RouteServiceProvider extends ServiceProvider
             'id'    => '[0-9]+', // @todo "year" will also be caught by this
             'slug'  => '[a-z0-9-]+', // @todo "type" is also a "slug"
             'vue'   => '[\/\w\.-]*',
-        ]);
+            ]
+        );
         parent::boot();
     }
 

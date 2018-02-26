@@ -19,21 +19,25 @@ class SocialAccountService
         if ($account) {
             return $account->user;
         } else {
-            $account = new SocialAccount([
+            $account = new SocialAccount(
+                [
                 'provider_user_id' => $providerUser->getId(),
                 'provider'         => $providerName,
                 'avatar'           => $providerUser->getAvatar(),
-            ]);
+                ]
+            );
 
             $user = User::whereEmail($providerUser->getEmail())->first();
 
             if (!$user) {
-                $user = User::create([
+                $user = User::create(
+                    [
                     'email'          => $providerUser->getEmail(),
                     'name'           => $providerUser->getName(),
                     'password'       => Hash::make(time()),
                     'remember_token' => true,
-                ]);
+                    ]
+                );
             }
 
             $account->user()->associate($user);

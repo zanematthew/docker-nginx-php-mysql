@@ -22,10 +22,12 @@ class Schedule extends Model
     public function events()
     {
         // One Schedule has many Events
-        return $this->belongsToMany('App\Event')->withPivot([
+        return $this->belongsToMany('App\Event')->withPivot(
+            [
             'created_at',
             'updated_at',
-        ]);
+            ]
+        );
     }
 
     public function setNameAttribute($value)

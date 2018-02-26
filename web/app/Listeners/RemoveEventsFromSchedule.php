@@ -21,7 +21,7 @@ class RemoveEventsFromSchedule
     /**
      * Handle the event.
      *
-     * @param  BeforeScheduleDeleted  $event
+     * @param  BeforeScheduleDeleted $event
      * @return void
      */
     public function handle(BeforeScheduleDeleted $event)

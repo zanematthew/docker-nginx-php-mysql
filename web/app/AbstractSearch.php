@@ -35,12 +35,14 @@ abstract class AbstractSearch extends Controller
     {
         $hits = [];
         if ($response) {
-            $hits = array_map(function ($item) {
-                if ($this->hasExtraFields($item)) {
-                    return array_merge($item['_source'], $this->getExtraFields($item));
-                }
-                return $item['_source'];
-            }, $response['hits']['hits']);
+            $hits = array_map(
+                function ($item) {
+                    if ($this->hasExtraFields($item)) {
+                        return array_merge($item['_source'], $this->getExtraFields($item));
+                    }
+                    return $item['_source'];
+                }, $response['hits']['hits']
+            );
         }
         return $hits;
     }

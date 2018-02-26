@@ -22,15 +22,17 @@ class RemoveScheduleFromLibrary
     /**
      * Handle the event.
      *
-     * @param  BeforeScheduleDeleted  $event
+     * @param  BeforeScheduleDeleted $event
      * @return void
      */
     public function handle(BeforeScheduleDeleted $event)
     {
-        $libraryItem = Library::where([
+        $libraryItem = Library::where(
+            [
             'item_id' => $event->schedule->id,
             'user_id' => \Auth::id(),
-        ]);
+            ]
+        );
         $libraryItem->delete();
     }
 }

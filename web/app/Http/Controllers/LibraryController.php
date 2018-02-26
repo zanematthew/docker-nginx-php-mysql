@@ -25,10 +25,12 @@ class LibraryController extends Controller
     public function toggle(Request $request, Library $library): \Illuminate\Http\JsonResponse
     {
         $fqc = $this->typeToFqc($request->item_type);
-        $foundItem = Library::where([
+        $foundItem = Library::where(
+            [
             'item_id'   => $request->item_id,
             'item_type' => $fqc,
-        ])->with($request->item_type)->get()->first();
+            ]
+        )->with($request->item_type)->get()->first();
 
         if (is_null($foundItem)) {
             if ($request->item_type === 'event') {
@@ -47,10 +49,12 @@ class LibraryController extends Controller
             $detached = $foundItem['event'];
         }
 
-        return response()->json([
+        return response()->json(
+            [
             'attached' => $attached ?? false,
             'detached' => $detached ?? false,
-        ]);
+            ]
+        );
     }
 
     /**
@@ -94,7 +98,7 @@ class LibraryController extends Controller
      * Converts the "item type", i.e, event, venue, schedule to the
      * fully qualified class name, i.e., App\Event.
      *
-     * @todo  This can/should be handled via polymorphism, but this works
+     * @todo   This can/should be handled via polymorphism, but this works
      * for now.
      * @param  string $type The item type.
      * @return string
@@ -103,18 +107,18 @@ class LibraryController extends Controller
     public function typeToFqc($type = null): string
     {
         switch ($type) {
-            case 'event':
-                $modelFqc = 'App\Event';
-                break;
-            case 'venue';
-                $modelFqc = 'App\Venue';
-                break;
-            case 'schedule';
-                $modelFqc = 'App\Schedule';
-                break;
-            default:
-                $modelFqc = '';
-                break;
+        case 'event':
+            $modelFqc = 'App\Event';
+            break;
+        case 'venue';
+            $modelFqc = 'App\Venue';
+            break;
+        case 'schedule';
+            $modelFqc = 'App\Schedule';
+            break;
+        default:
+            $modelFqc = '';
+            break;
         }
         return $modelFqc;
     }

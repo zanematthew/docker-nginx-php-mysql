@@ -88,7 +88,7 @@ phpmd:
 
 phpcbf:
 	@docker-compose exec -T php \
-		./app/vendor/bin/phpcbf \
-		app/src/
+		./vendor/bin/phpcbf \
+		app/
 
 .PHONY: clean test code-sniff init

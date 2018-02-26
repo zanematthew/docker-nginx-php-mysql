@@ -35,9 +35,11 @@ class User extends Authenticatable
 
     public function socialAccount()
     {
-        return $this->hasOne('App\SocialAccount')->withDefault([
+        return $this->hasOne('App\SocialAccount')->withDefault(
+            [
             'avatar' => '',
-        ]);
+            ]
+        );
     }
 
     public function library()

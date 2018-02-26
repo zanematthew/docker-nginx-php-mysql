@@ -18,9 +18,11 @@ class VenueController extends Controller
             // Validate
             $states = explode(',', request('states'));
 
-            $q->whereHas('city.states', function ($query) use ($states) {
-                $query->whereIn('abbr', $states);
-            });
+            $q->whereHas(
+                'city.states', function ($query) use ($states) {
+                    $query->whereIn('abbr', $states);
+                }
+            );
         }
 
         return $q;
@@ -32,8 +34,8 @@ class VenueController extends Controller
         $q = \App\Venue::with('city.states', 'events');
         $q = $this->handleRequest($q);
         return $q->orderby('name', 'asc')
-                 ->paginate($this->paginate)
-                 ->appends(request($this->params));
+            ->paginate($this->paginate)
+            ->appends(request($this->params));
 
         // return \App\Venue::with('city.states', 'events')->whereHas('events', function ($query) {
         //     $query->whereBetween('start_date', [
@@ -45,9 +47,11 @@ class VenueController extends Controller
 
     public function state($state = null)
     {
-        return \App\Venue::with('city.states', 'events')->whereHas('city.states', function ($query) use ($state) {
-            $query->where('abbr', strtoupper($state));
-        })->paginate($this->paginate);
+        return \App\Venue::with('city.states', 'events')->whereHas(
+            'city.states', function ($query) use ($state) {
+                $query->where('abbr', strtoupper($state));
+            }
+        )->paginate($this->paginate);
     }
 
     public function single($venueId = null)
@@ -57,9 +61,11 @@ class VenueController extends Controller
 
     public function events($venueId = null)
     {
-        return \App\Event::where('venue_id', $venueId)->whereBetween('start_date', [
+        return \App\Event::where('venue_id', $venueId)->whereBetween(
+            'start_date', [
             date('Y-m-d', strtotime('today')),
             date('Y-m-d', strtotime('last day of this month')),
-        ])->paginate($this->paginate);
+            ]
+        )->paginate($this->paginate);
     }
 }

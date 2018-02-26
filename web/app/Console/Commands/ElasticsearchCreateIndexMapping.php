@@ -46,7 +46,7 @@ class ElasticsearchCreateIndexMapping extends Command
 
         if (Elasticsearch::indices()->exists($params)) {
             $destroyIndex = $this->option('destroy') ?: $this->choice('Index exists. Destroy it, and create a new one?', ['Yes', 'No'], 1);
-            if ($destroyIndex === 'No'){
+            if ($destroyIndex === 'No') {
                 $this->info('Exiting.');
                 return;
             }

@@ -16,57 +16,75 @@ class SearchEventController extends AbstractSearch
      *   - sorted by geo location
      *
      * @todo   needs test
-     * @param  String $text    Search text.
-     * @param  String $latlon  Geo-point as a string.
+     * @param  String $text   Search text.
+     * @param  String $latlon Geo-point as a string.
      * @return Object[         HTTP Json response
      */
     public function phrase(Request $request): \Illuminate\Http\JsonResponse
     {
-        list($lat, $lon) = explode(',' , $request->latlon);
-        return response()->json($this->formatResults(\Elasticsearch::searchTemplate([
-            'body' => [
-                'id' => 'event-suggest',
-                'params' => [
+        list($lat, $lon) = explode(',', $request->latlon);
+        return response()->json(
+            $this->formatResults(
+                \Elasticsearch::searchTemplate(
+                    [
+                    'body' => [
+                    'id' => 'event-suggest',
+                    'params' => [
                     'lat'      => $lat,
                     'lon'      => $lon,
                     'latlon'   => $request->latlon,
                     'distance' => 250,
-                ]
-            ]
-        ])));
+                    ]
+                    ]
+                    ]
+                )
+            )
+        );
     }
 
     public function suggestion(Request $request): \Illuminate\Http\JsonResponse
     {
-        list($lat, $lon) = explode(',' , $request->latlon);
-        return response()->json($this->formatResults(\Elasticsearch::searchTemplate([
-            'body' => [
-                'id' => 'event-suggest',
-                'params' => [
+        list($lat, $lon) = explode(',', $request->latlon);
+        return response()->json(
+            $this->formatResults(
+                \Elasticsearch::searchTemplate(
+                    [
+                    'body' => [
+                    'id' => 'event-suggest',
+                    'params' => [
                     'lat'      => $lat,
                     'lon'      => $lon,
                     'latlon'   => $request->latlon,
                     'distance' => 250,
-                ]
-            ]
-        ])));
+                    ]
+                    ]
+                    ]
+                )
+            )
+        );
     }
 
     public function date(Request $request): \Illuminate\Http\JsonResponse
     {
-        list($lat, $lon) = explode(',' , $request->latlon);
-        return response()->json($this->formatResults(\Elasticsearch::searchTemplate([
-            'body' => [
-                'id' => 'event-date',
-                'params' => [
+        list($lat, $lon) = explode(',', $request->latlon);
+        return response()->json(
+            $this->formatResults(
+                \Elasticsearch::searchTemplate(
+                    [
+                    'body' => [
+                    'id' => 'event-date',
+                    'params' => [
                     'to'       => $request->to,
                     'from'     => $request->from,
                     'lat'      => $lat,
                     'lon'      => $lon,
                     'latlon'   => $request->latlon,
                     'distance' => 250,
-                ]
-            ]
-        ])));
+                    ]
+                    ]
+                    ]
+                )
+            )
+        );
     }
 }

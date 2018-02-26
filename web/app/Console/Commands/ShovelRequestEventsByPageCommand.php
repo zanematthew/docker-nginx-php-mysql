@@ -71,7 +71,7 @@ class ShovelRequestEventsByPageCommand extends Command
         }
 
         $events = $result->events();
-        if (empty($events)){
+        if (empty($events)) {
             $this->info('No events');
             return 0;
         }

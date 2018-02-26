@@ -34,15 +34,19 @@ class ShovelVenue extends AbstractShovelClient
             return [];
         }
 
-        $contact = array_filter($this->filter('#track_contact ul li')->each(function ($node) {
-            $text = $node->filter('li')->text();
-            if (str_contains($text, ':')) {
-                list($title, $content) = explode(':', $text);
-                $key = lcfirst(trim(camel_case($title))); // clean title
-                $key = $key == 'trackPhone' ? 'phone' : $key;
-                return [$key => $this->aggressiveTrim($content)];
-            }
-        }));
+        $contact = array_filter(
+            $this->filter('#track_contact ul li')->each(
+                function ($node) {
+                    $text = $node->filter('li')->text();
+                    if (str_contains($text, ':')) {
+                        list($title, $content) = explode(':', $text);
+                        $key = lcfirst(trim(camel_case($title))); // clean title
+                        $key = $key == 'trackPhone' ? 'phone' : $key;
+                        return [$key => $this->aggressiveTrim($content)];
+                    }
+                }
+            )
+        );
 
         $tmp = [];
 
@@ -92,13 +96,15 @@ class ShovelVenue extends AbstractShovelClient
             list($zip, $country) = explode('<br>', $zipCountry);
         }
 
-        return array_map('strip_tags', [
+        return array_map(
+            'strip_tags', [
             'street'    => $street,
             'city'      => $city,
             'stateAbbr' => strtoupper($state),
             'zipCode'   => $zip,
             'country'   => strtoupper($country),
-        ]);
+            ]
+        );
     }
 
     public function getStreet(): string
@@ -128,12 +134,18 @@ class ShovelVenue extends AbstractShovelClient
 
     public function parseLinksUri($linkText = null): string
     {
-        $link = array_values(array_filter($this->filter('#track_location p')->each(function ($node) use ($linkText) {
-            if (empty($node->filter('a')->count())) {
-                return '';
-            }
-            return str_contains($node->text(), $linkText) ? $node->filter('a')->attr('href') : '';
-        })));
+        $link = array_values(
+            array_filter(
+                $this->filter('#track_location p')->each(
+                    function ($node) use ($linkText) {
+                        if (empty($node->filter('a')->count())) {
+                            return '';
+                        }
+                        return str_contains($node->text(), $linkText) ? $node->filter('a')->attr('href') : '';
+                    }
+                )
+            )
+        );
 
         return empty($link) ? '' : $link[0];
     }
@@ -160,9 +172,13 @@ class ShovelVenue extends AbstractShovelClient
 
     public function parseDescription(): string
     {
-        return implode(' ', $this->filter('#track_contact p')->each(function ($node) {
-            return $node->text();
-        }));
+        return implode(
+            ' ', $this->filter('#track_contact p')->each(
+                function ($node) {
+                    return $node->text();
+                }
+            )
+        );
     }
 
     public function parseDistrict(): string
