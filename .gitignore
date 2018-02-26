@@ -3,7 +3,15 @@
 .DS_Store
 
 # Application
-web/app/vendor
+web/vendor
+web/node_modules
+web/public/storage
+web/.env
+web/public/css
+web/public/js
+web/public/mix-manifest.json
+web/public/build
+*.sublime*
 
 # PHPStorm
 .idea/**/workspace.xml
