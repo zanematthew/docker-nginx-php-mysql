@@ -18,7 +18,7 @@
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+        <whitelist>
             <directory suffix=".php">./app</directory>
         </whitelist>
     </filter>
@@ -30,4 +30,10 @@
         <env name="DB_CONNECTION" value="mysql_testing"/>
         <env name="SCOUT_DRIVER" value="null"/>
     </php>
+
+    <logging>
+        <log type="coverage-html" target="./report/phpunit" charset="UTF-8"
+            yui="true" highlight="true"
+            lowUpperBound="50" highLowerBound="80" />
+    </logging>
 </phpunit>
