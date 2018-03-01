@@ -11,7 +11,7 @@ help:
 	@echo ""
 	@echo "Commands:"
 	@echo "  apidoc              Generate documentation of API"
-	@echo "  code-sniff          Check the API with PHP Code Sniffer (PSR2)"
+	@echo "  phpcs               Check the API with PHP Code Sniffer (PSR2)"
 	@echo "  phpmd               The ever so annoying, but fun PHP Mess Detecor"
 	@echo "  phpcbf              Fix dat sh!t."
 	@echo "  clean               Clean directories for reset"
@@ -40,10 +40,6 @@ clean:
 	@rm -Rf web/app/doc
 	@rm -Rf web/app/report
 	@rm -Rf etc/ssl/*
-
-code-sniff:
-	@echo "Checking the standard code..."
-	@docker-compose exec -T php ./vendor/bin/phpcs -v --standard=PSR2 app
 
 composer-update:
 	@docker run --rm -v $(shell pwd)/web:/app composer update
