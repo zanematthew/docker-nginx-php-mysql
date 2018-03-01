@@ -26,7 +26,7 @@ help:
 	@echo "  test                Test application"
 
 init:
-	@$(shell cp -n $(shell pwd)/web/app/composer.json.dist $(shell pwd)/web/app/composer.json 2> /dev/null)
+	@$(shell cp -n $(shell pwd)/web/composer.json.dist $(shell pwd)/web/composer.json 2> /dev/null)
 
 apidoc:
 	@docker-compose exec -T php ./app/vendor/bin/apigen generate app/src --destination app/doc
@@ -35,10 +35,10 @@ apidoc:
 clean:
 	@rm -Rf data/db/mysql/*
 	@rm -Rf $(MYSQL_DUMPS_DIR)/*
-	@rm -Rf web/app/vendor
-	@rm -Rf web/app/composer.lock
-	@rm -Rf web/app/doc
-	@rm -Rf web/app/report
+	@rm -Rf web/vendor
+	@rm -Rf web/composer.lock
+	@rm -Rf web/doc
+	@rm -Rf web/report
 	@rm -Rf etc/ssl/*
 
 composer-update:
@@ -68,12 +68,27 @@ mysql-dump:
 mysql-restore:
 	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
 
-test: code-sniff
-	@docker-compose exec -T php ./app/vendor/bin/phpunit --colors=always --configuration ./app/
+test: phpcs
+	@docker-compose exec -T php ./vendor/bin/phpunit --colors=always --configuration ./
 	@make resetOwner
 
 resetOwner:
-	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web/app" 2> /dev/null)
+	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web" 2> /dev/null)
+
+phpcbf:
+	@docker-compose exec -T php \
+		./vendor/bin/phpcbf \
+		--standard=PSR2 \
+		app/
+
+# @docker-compose exec -T php ./vendor/bin/phpcbf app/ --standard=PSR2
+
+phpcs:
+	@echo "Checking the standard code..."
+	@docker-compose exec -T php \
+		./vendor/bin/phpcs \
+		--standard=PSR2 \
+		app/
 
 phpmd:
 	@docker-compose exec -T php \
@@ -82,9 +97,4 @@ phpmd:
 		text \
 		cleancode,codesize,controversial,design,naming,unusedcode
 
-phpcbf:
-	@docker-compose exec -T php \
-		./vendor/bin/phpcbf \
-		app/
-
-.PHONY: clean test code-sniff init
+.PHONY: clean test phpcs init
