@@ -28,6 +28,10 @@ help:
 init:
 	@$(shell cp -n $(shell pwd)/web/composer.json.dist $(shell pwd)/web/composer.json 2> /dev/null)
 
+artisan:
+	@docker-compose exec php \
+	php artisan
+
 apidoc:
 	@docker-compose exec -T php ./app/vendor/bin/apigen generate app/src --destination app/doc
 	@make resetOwner
@@ -67,6 +71,12 @@ mysql-dump:
 
 mysql-restore:
 	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
+
+npm-install:
+	@docker run --rm -v \
+		$(shell pwd)/web:/app \
+		node \
+		sh -c "cd /app ; npm install"
 
 test: phpcs
 	@docker-compose exec -T php ./vendor/bin/phpunit --colors=always --configuration ./

@@ -27,18 +27,19 @@ services:
       - "./web:/var/www/html"
   composer:
     image: "composer"
-    container_name: ${APP_NAME}_composer
-    volumes:
-        - "./web/app:/app"
-    command: install
+    container_name: foo_composer
+  node:
+    image: node:8
+    container_name: foo_node
+    command: "npm -v"
   myadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: ${APP_NAME}_phpmyadmin
+    container_name: foo_phpmyadmin
     ports:
       - "8080:80"
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOST=${MYSQL_HOST}
+      - PMA_HOST=${APP_NAME}_${MYSQL_HOST}
     restart: always
     depends_on:
       - mysqldb
@@ -83,8 +84,18 @@ services:
       - 9200:9200
     networks:
       - esnet_new
+  # Ref:
+  #   https://github.com/nodejs/docker-node/issues/533#issuecomment-333867800
+  #   https://github.com/vcarreira/docker-laravel/blob/master/docker-compose.yml
+  # Is redis working?
+  # Need node modules installed
+  # Need npm commands working;
+  #   npm run hot
+  #   npm run production
 volumes:
   esdata1:
     driver: local
 networks:
   esnet_new:
+
+# If any service exists I want to stop the entire thing.
