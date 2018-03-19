@@ -12,8 +12,12 @@ use GuzzleHttp\Psr7\Response;
 
 use App\ShovelEvent;
 
+/**
+ * @group shovel
+ */
 class ShovelEventTest extends TestCase
 {
+
     public function setUp()
     {
         parent::setUp();

@@ -11,6 +11,9 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use App\ShovelVenue;
 
+/**
+ * @group  shovel-venue
+ */
 class ShovelVenueTest extends TestCase
 {
     public function setUp()
@@ -117,5 +120,41 @@ class ShovelVenueTest extends TestCase
     public function testParseName()
     {
         $this->assertEquals('Chesapeake BMX', $this->venue->parseName());
+    }
+
+    public function testParseLocationFromP()
+    {
+        $this->assertArraySubset([
+            'street'    => '726 Donaldson Avenue',
+            'city'      => 'Severn',
+            'stateAbbr' => 'MD',
+            'zipCode'   => 21144,
+            'country'   => 'USA',
+        ], $this->venue->parseLocationFromP());
+    }
+
+    public function testParseLocationMissingZipFromP()
+    {
+        $venueHtml = file_get_contents(base_path('tests/Unit/data/single-venue-missing-zip.html'));
+        $mock      = new MockHandler([
+            new Response(200, ['Content-type' => 'text/html'], $venueHtml),
+        ]);
+
+        $httpClient = new GuzzleClient([
+            'handler' => HandlerStack::create($mock),
+        ]);
+
+        $goutte = new GoutteClient();
+        $goutte->setClient($httpClient);
+
+        $venue = new ShovelVenue(123);
+        $venue->setClient($goutte);
+        $this->venue = $venue;
+
+        $this->assertArraySubset([
+            'street'    => '4801 W Colonial Dr',
+            'city'      => 'Orlando',
+            'stateAbbr' => 'FL',
+        ], $this->venue->parseLocationFromP());
     }
 }
