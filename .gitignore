@@ -28,4 +28,4 @@ nbproject/
 etc/ssl/
 
 database/data/
-search/esdata1
+elasticsearch/esdata1

@@ -18,6 +18,8 @@ services:
     depends_on:
       - php
       - mysqldb
+    networks:
+      - esnet_new
   php:
     image: nanoninja/php-fpm:${PHP_VERSION}
     container_name: ${APP_NAME}_php
@@ -25,13 +27,16 @@ services:
     volumes:
       - "./etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
       - "./web:/var/www/html"
+    networks:
+      - esnet_new
   composer:
     image: "composer"
     container_name: foo_composer
-  node:
-    image: node:8
-    container_name: foo_node
-    command: "npm -v"
+  # node:
+  #   image: node:8
+  #   container_name: foo_node
+  #   volumes:
+  #     - "./web:/var/www/html"
   myadmin:
     image: phpmyadmin/phpmyadmin
     container_name: foo_phpmyadmin
@@ -58,11 +63,13 @@ services:
       - "8989:3306"
     volumes:
       - "./database/data/db/mysql:/var/lib/mysql"
+    networks:
+      - esnet_new
   kibana:
     image: docker.elastic.co/kibana/kibana:6.2.2
     container_name: ${APP_NAME}_kibana
     volumes:
-      - ./search/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - 5601:5601
     networks:
@@ -71,7 +78,6 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
     container_name: ${APP_NAME}_elasticsearch
     environment:
-      - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
@@ -79,7 +85,8 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - ./search/esdata1:/usr/share/elasticsearch/data
+      - ./elasticsearch/esdata1:/usr/share/elasticsearch/data
+      - ./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
     ports:
       - 9200:9200
     networks:
@@ -87,15 +94,9 @@ services:
   # Ref:
   #   https://github.com/nodejs/docker-node/issues/533#issuecomment-333867800
   #   https://github.com/vcarreira/docker-laravel/blob/master/docker-compose.yml
-  # Is redis working?
-  # Need node modules installed
-  # Need npm commands working;
-  #   npm run hot
-  #   npm run production
+  # Is redis working? Currently its bundled with the php image from that guy.
 volumes:
   esdata1:
     driver: local
 networks:
   esnet_new:
-
-# If any service exists I want to stop the entire thing.
