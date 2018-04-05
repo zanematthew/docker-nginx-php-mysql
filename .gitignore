@@ -29,3 +29,9 @@ etc/ssl/
 
 database/data/
 elasticsearch/esdata1
+
+.idea
+web/.idea
+web/public/report
+web/report
+web/public/hot
