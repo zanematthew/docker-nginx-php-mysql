@@ -30,7 +30,7 @@ init:
 
 artisan:
 	@docker-compose exec php \
-	php artisan
+	php artisan $(cmd)
 
 apidoc:
 	@docker-compose exec -T php ./app/vendor/bin/apigen generate app/src --destination app/doc
@@ -108,3 +108,5 @@ phpmd:
 		cleancode,codesize,controversial,design,naming,unusedcode
 
 .PHONY: clean test phpcs init
+
+# docker run --rm -v /Users/zanekolnik/Documents/docker-nginx-php-mysql/web:/app node sh -c "cd /app ; npm run production"
