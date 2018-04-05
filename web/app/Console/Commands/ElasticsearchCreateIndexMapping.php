@@ -17,10 +17,11 @@ class ElasticsearchCreateIndexMapping extends Command
 
     /**
      * The console command description.
+     * Detail see; https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html';
      *
      * @var string
      */
-    protected $description = 'Install an index pattern, based on the .env value. Detail see; https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html';
+    protected $description = 'Install an index pattern, based on the .env value.';
 
     /**
      * Create a new command instance.
@@ -43,7 +44,11 @@ class ElasticsearchCreateIndexMapping extends Command
         $this->info(sprintf('Creating index pattern based on value from .env: %s', $index));
 
         if (Elasticsearch::indices()->exists(['index' => $index])) {
-            $destroyIndex = $this->option('destroy') ?: $this->choice('Index exists. Destroy it, and create a new one?', ['Yes', 'No'], 1);
+            $destroyIndex = $this->option('destroy') ?: $this->choice(
+                'Index exists. Destroy it, and create a new one?',
+                ['Yes', 'No'],
+                1
+            );
             if ($destroyIndex === 'No') {
                 $this->info('Exiting.');
                 return;

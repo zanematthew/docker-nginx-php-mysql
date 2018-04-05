@@ -110,10 +110,10 @@ class LibraryController extends Controller
             case 'event':
                 $modelFqc = 'App\Event';
                 break;
-            case 'venue';
+            case 'venue':
                 $modelFqc = 'App\Venue';
                 break;
-            case 'schedule';
+            case 'schedule':
                 $modelFqc = 'App\Schedule';
                 break;
             default:

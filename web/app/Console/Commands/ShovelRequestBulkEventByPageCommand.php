@@ -68,7 +68,9 @@ class ShovelRequestBulkEventByPageCommand extends Command
         $i = 1;
         foreach ($contentsToProcess as $content) {
             $this->line('----------------------------------------------------------------------------------');
-            $this->comment("Processing ({$i} of {$itemsAvailableCount}), Venue ID: {$content['venue_id']}, Page ID: {$content['page_id']}");
+            $this->comment("Processing ({$i} of {$itemsAvailableCount}), 
+            Venue ID: {$content['venue_id']}, 
+            Page ID: {$content['page_id']}");
             $startMonthIterator = $startMonth;
             while ($startMonthIterator <= $endMonth) {
                 $exitCode = $this->call(

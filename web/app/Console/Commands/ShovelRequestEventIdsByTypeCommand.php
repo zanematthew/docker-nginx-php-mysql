@@ -48,7 +48,11 @@ class ShovelRequestEventIdsByTypeCommand extends Command
     public function handle()
     {
         // Handle input.
-        $type = $this->option('type') ?? $this->choice('Event Type?', array_keys(array_merge([0 => 'all'], $this->eventTypes)), 0);
+        $type = $this->option('type') ?? $this->choice(
+            'Event Type?',
+            array_keys(array_merge([0 => 'all'], $this->eventTypes)),
+            0
+        );
 
         if ($this->isTypeValid($type) === false) {
             $this->error("Invalid type: {$type}.");
@@ -172,7 +176,13 @@ class ShovelRequestEventIdsByTypeCommand extends Command
         $filename = str_slug("{$year} {$pastOnlyText} {$type} page {$pageRangeText} of {$maxPage} event ids", '-');
 
         // Prompt to save results.
-        $save = $this->option('save') ?: $this->choice("Save to disk? [{$filename}]", ['Y', 'N'], 1); if ($save === "N") {
+        $save = $this->option('save') ?: $this->choice(
+            "Save to disk? [{$filename}]",
+            ['Y', 'N'],
+            1
+        );
+
+        if ($save === "N") {
             $this->info('Done.');
             return true;
         }

@@ -21,7 +21,7 @@ class ShovelImportDetailCommand extends Command
      */
     protected $signature = 'shovel:import-detail
                             {--t|type= : The requested type [venue|event].}
-                            {--f|file_path= : The file path relative to the Storage directory, i.e., public/venues/detail/154-river-valley-bmx.json.}
+                            {--f|file_path= : The file path relative to the Storage directory.}
                             {--s|save : Save to the database.}
                             {--r|remove_file : Remove import from file when done.}
                             {--o|overwrite : If the venue|event already exists, overwrite the existing item.}';
@@ -122,7 +122,11 @@ class ShovelImportDetailCommand extends Command
 
         // Handle overwrite
         if ($venue) {
-            $overwrite = $this->option('overwrite') ?: $this->choice("Venue {$venue->name} ({$venue->id}) exists, overwrite?", ['Y', 'N'], 1);
+            $overwrite = $this->option('overwrite') ?: $this->choice(
+                "Venue {$venue->name} ({$venue->id}) exists, overwrite?",
+                ['Y', 'N'],
+                1
+            );
             if ($overwrite === 'N') {
                 return [
                     'message'  => 'Done',
@@ -216,7 +220,11 @@ class ShovelImportDetailCommand extends Command
         // Check if Event exists
         $event = \App\Event::where('usabmx_id', $contentsArray['usabmx_id'])->first();
         if ($event) {
-            $overwrite = $this->option('overwrite') ?: $this->choice("Event {$event->title} ({$event->id}) exists, overwrite?", ['Y', 'N'], 1);
+            $overwrite = $this->option('overwrite') ?: $this->choice(
+                "Event {$event->title} ({$event->id}) exists, overwrite?",
+                ['Y', 'N'],
+                1
+            );
             if ($overwrite === 'N') {
                 return [
                     'message'  => 'Done',
