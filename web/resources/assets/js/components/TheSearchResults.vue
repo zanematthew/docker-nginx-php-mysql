@@ -55,6 +55,7 @@ import { mapState } from 'vuex';
 import searchResultEvent from '~/components/SearchResultEvent';
 import searchResultVenue from '~/components/SearchResultVenue';
 import close from '~/components/Close';
+import lodash from 'lodash';
 
 export default {
   components: {
@@ -114,9 +115,6 @@ export default {
     this.setSuggestedResults();
   },
   watch: {
-    '$route' (to, from) {
-      this.updateSearchType();
-    },
     currentText: function () {
       this.search();
     }

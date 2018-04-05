@@ -15,24 +15,6 @@
     <a :href="event.flyer_uri" target="_blank">Flier (PDF)</a>
   </div>
 
-  <!-- Map -->
-  <div class="row">
-    <gmap-map
-      :options="defaultOptions"
-      :draggable="false"
-      :center="center"
-      :zoom="7"
-      style="width: 100%; height: 300px"
-    >
-      <gmap-marker
-        :key="index"
-        v-for="(m, index) in markers"
-        :position="m.position"
-        @click="center=m.position"
-      ></gmap-marker>
-    </gmap-map>
-  </div>
-
   <!-- Venue Detail -->
   <venue-contact :venue="event.venue" class="row is-item grid is-100"></venue-contact>
 
@@ -49,15 +31,7 @@ import venueContact from '~/components/VenueContact';
 import actionBar from '~/components/ActionBar';
 import tabsEvents from '~/components/TabsEvents';
 
-import * as VueGoogleMaps from 'vue2-google-maps';
 import Vue from 'vue';
-
-Vue.use(VueGoogleMaps, {
-  load: {
-    key: 'AIzaSyAVD89EibFYXW5pAA7DeVDMv3qfB4gtigg',
-    v: '3.27',
-  }
-});
 
 var numeral = require('numeral');
 
@@ -81,12 +55,6 @@ export default {
   data() {
     return {
       event: { venue: { city: { states: '' } } },
-      center: { lat: 39.2904, lng: 76.6122 },
-      markers: [],
-      defaultOptions: {
-        scrollwheel: false,
-        mapTypeControl: false,
-      },
       relatedEvents: [],
       pageTitle: '...'
     }
@@ -110,11 +78,6 @@ export default {
       // @todo move to api/Event.js
       axios.get('/api/event/'+this.id+'/').then(response => {
         this.event = response.data;
-        this.center.lat = parseInt(response.data.venue.lat);
-        this.center.lng = parseInt(response.data.venue.long);
-        this.markers = [{
-          position: {lat: parseInt(response.data.venue.lat), lng: parseInt(response.data.venue.long)}
-        }];
         this.pageTitle = `${this.event.venue.name} // ${this.event.title}`;
         return response.data;
       }).then(response => {
@@ -137,9 +100,3 @@ export default {
   }
 }
 </script>
-<style lang="scss">
-@import "../../sass/variables";
-.vue-map-container {
-  border: 1px solid $light-gray;
-}
-</style>
