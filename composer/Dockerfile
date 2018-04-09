@@ -1,0 +1,20 @@
+FROM mybmx_php
+
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+#RUN apk --no-cache add curl git subversion openssh openssl mercurial tini bash zlib-dev
+
+RUN apt-get install git
+RUN docker-php-ext-install zip
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_HOME /tmp
+ENV COMPOSER_VERSION latest
+
+#COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+WORKDIR /app
+
+ENTRYPOINT ["/usr/bin/composer"]
+
+#CMD ["composer"]

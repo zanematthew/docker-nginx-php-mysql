@@ -18,7 +18,8 @@ services:
     networks:
       - mybmx_network
   php:
-    image: nanoninja/php-fpm:${PHP_VERSION}
+    build:
+      context: ./php-fpm
     container_name: ${APP_NAME}_php
     restart: always
     volumes:
@@ -27,7 +28,8 @@ services:
     networks:
       - mybmx_network
   composer:
-    image: "composer"
+    build:
+      context: ./composer
     container_name: ${APP_NAME}_composer
   myadmin:
     image: phpmyadmin/phpmyadmin
@@ -57,6 +59,10 @@ services:
       - "./database/data/db/mysql:/var/lib/mysql"
     networks:
       - mybmx_network
+
+# This is available at;
+# http://localhost:5601/app/kibana
+# Note; it does take time for ES/Kiabana to start
   kibana:
     image: docker.elastic.co/kibana/kibana:6.2.2
     container_name: ${APP_NAME}_kibana
@@ -66,6 +72,8 @@ services:
       - 5601:5601
     networks:
       - mybmx_network
+# Health check
+# http://localhost:9200/_cat/health
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
     container_name: ${APP_NAME}_elasticsearch

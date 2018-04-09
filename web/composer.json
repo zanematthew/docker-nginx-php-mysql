@@ -21,7 +21,8 @@
         "toin0u/geocoder-laravel": "^4.0",
         "weidner/goutte": "^1.0",
         "tamayo/laravel-scout-elastic": "dev-master",
-        "cviebrock/laravel-elasticsearch": "^3.1.1"
+        "cviebrock/laravel-elasticsearch": "^3.1.1",
+        "laravel/horizon": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

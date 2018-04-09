@@ -11,9 +11,12 @@ help:
 	@echo ""
 	@echo "Commands:"
 	@echo "  apidoc              Generate documentation of API"
+	@echo "  build               Build application images"
 	@echo "  phpcs               Check the API with PHP Code Sniffer (PSR2)"
 	@echo "  phpmd               The ever so annoying, but fun PHP Mess Detecor"
 	@echo "  phpcbf              Fix dat sh!t."
+	@echo "  start               Start the app."
+	@echo "  stop                Stop the app."
 	@echo "  clean               Clean directories for reset"
 	@echo "  composer-update     Update PHP dependencies with composer"
 	@echo "  composer-install    Install PHP dependencies with composer"
@@ -29,7 +32,7 @@ init:
 	@$(shell cp -n $(shell pwd)/web/composer.json.dist $(shell pwd)/web/composer.json 2> /dev/null)
 
 artisan:
-	@docker-compose exec php \
+	@docker-compose exec mybmx_php \
 	php artisan $(cmd)
 
 apidoc:
@@ -46,10 +49,10 @@ clean:
 	@rm -Rf etc/ssl/*
 
 composer-update:
-	@docker run --rm -v $(shell pwd)/web:/app composer update
+	@docker run --rm -v $(shell pwd)/web:/app mybmx_composer update
 
 composer-install:
-	@docker run --rm -v $(shell pwd)/web:/app composer install
+	@docker run --rm -v $(shell pwd)/web:/app mybmx_composer install
 
 docker-start: init
 	docker-compose up -d
@@ -86,26 +89,36 @@ resetOwner:
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web" 2> /dev/null)
 
 phpcbf:
-	@docker-compose exec -T php \
+	@docker-compose exec -T mybmx_php \
 		./vendor/bin/phpcbf \
 		--standard=PSR2 \
 		app/
 
-# @docker-compose exec -T php ./vendor/bin/phpcbf app/ --standard=PSR2
+# @docker-compose exec -T mybmx_php ./vendor/bin/phpcbf app/ --standard=PSR2
 
 phpcs:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T php \
+	@docker-compose exec -T mybmx_php \
 		./vendor/bin/phpcs \
 		--standard=PSR2 \
 		app/
 
 phpmd:
-	@docker-compose exec -T php \
+	@docker-compose exec -T mybmx_php \
 		./vendor/bin/phpmd \
 		app/ \
 		text \
 		cleancode,codesize,controversial,design,naming,unusedcode
+
+build:
+	@docker-compose build php
+	@docker-compose build composer
+
+start: build
+	@docker-compose up -d
+
+stop:
+	@docker-compose down
 
 .PHONY: clean test phpcs init
 
