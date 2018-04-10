@@ -35,3 +35,5 @@ web/.idea
 web/public/report
 web/report
 web/public/hot
+
+redis/data
