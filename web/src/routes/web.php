@@ -1,5 +1,30 @@
 <?php
 
+Route::get('/db', function () {
+    try {
+        $dsn = 'mysql:host=mysqldb;dbname=test;charset=utf8;port=3306';
+        $pdo = new PDO($dsn, 'dev', 'dev');
+        echo "Connected";
+    } catch (PDOException $e) {
+        echo $e->getMessage();
+    }
+});
+
+Route::get('/save', function () {
+    $item = App\Venue::find(1);
+    $item->name = 'foo';
+    dd($item->save());
+});
+
+Route::get('/ping', function () {
+    // $client = \Elasticsearch\ClientBuilder::create()
+    //     ->setHosts(['elasticsearch'])
+    //     ->build();
+    // dd($client);
+    // dd($client->ping());
+    dd(Elasticsearch::ping());
+});
+
 Route::get('/test-search', function(){
     // use Elasticsearch\ClientBuilder;
     $client = \Elasticsearch\ClientBuilder::create()->build();

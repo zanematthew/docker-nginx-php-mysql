@@ -1,19 +1,60 @@
-# Setup
+# 1. App: Install
 
-1. Run migrations
-2. Seed Database
-3. Run Unit Test
-4. Develop
+1. Install server-side dependenceis `$ composer install`
+2. Install front-end dependencies `$ npm install`
+3. Run migrations `$ php artisan migrate`
+4. Install Elasticsearch [Index Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html) `$ php artisan elasticsearch:install`
+5. Install Elasticsearch [Templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html) `$ php artisan elasticsearch:installTemplates`
+6. Import Venues & Events into MySQL database `$ php artisan shovel:import-bulk`
+7. Index Venues `$ php artisan scout:import "App\Venue"`
+8. Index Events `$ php artisan scout:import "App\Venue"`
+9. Build compile assets `$ npm run production`
+10. App available at; `https://localhost:3000`
 
-# Database
+[Very annoying Kibana issue](https://discuss.elastic.co/t/forbidden-12-index-read-only-allow-delete-api/110282/3)
 
-## Migrations
+# 2. App: Initial Content
+
+Overview; parse webpage for relevant content; save to disk, normalize, indexed.
+
+End goal is;
+
+* Venue Detail
+* Event Detail
+
+Inorder to retrieve this we will request all Venue and Event IDs, once we have the IDs we will request Venue and Event detail based on the ID.
+
+## Bulk Venue Processing
+
+To retrieve Venue IDs, we will send an HTTP request to a known URL that contains all venue IDs by state, once we recieve this request, we will then save all Venue IDs as a single JSON file.
+
+Using the Venue IDs file, we will iterator over the file contents and send a HTTP request per Venue ID requesting Venue detail, once detail is received we save this detail to disk and remove the Venue ID from our file. This is repeated until all Venue IDs are processed, once all are processed the file is removed.
+
+### Bulk Venue Processing Commands
+
+1. Request *all* Venue Ids by state: `$ php artisan shovel:request-venue-ids-all --save`
+2. Request *all* Venue detail by exisiting Venue Ids file: `$ php artisan shovel:request-detail-bulk --type=venue --count=200 --save —delete_source` 
+3. Import Venue Detail into Database & Index: `$ php artisan shovel:import-bulk --type=venue --count=200`
+
+## Bulk Event Processing
+
+–
+
+### Bulk Event Processing Commands
+
+1. Request *all* Event Ids by Type, you'll need to manually run this command per type, and per page range:
+   1.  `$ php artisan shovel:request-event-ids-by-type --year=upcoming --type=national --page_range=1-10`
+2. Request *all* Event detail by exisiting Event Ids file: `$ php artisan shovel:request-detail-bulk --type=event --count=200 --save --delete_source`
+   1. IDs are randomly selected from the source file.
+   2. Will exit if a single item fails to save
+   3. As IDs are read from the source file, if they detail is saved the IDs is removed from the file
+3. Import Event Detail into Database & Index: `$ php artisan shovel:import-bulk --type=event --count=200`
 
 ## Seeding
 
 # Models
 
-All Models are defined using the [`php artian make:model <Model>`](https://laravel.com/docs/5.4/eloquent#defining-models) command.
+All Models are defined using the [`php artsian make:model <Model>`](https://laravel.com/docs/5.4/eloquent#defining-models) command.
 
 This application has the following models:
 
@@ -122,13 +163,6 @@ Plus state abbr
 `.env`, DB_DATABASE_TEST mysql_testing
 `config/database.php`
 
-# Notes
-
-php artisan make:index-configurator MyIndexConfigurator
-php artisan elastic:create-index "App\EventIndexConfigurator"
-php artisan elastic:update-mapping App\\Event
-php artisan scout:import "App\Event"
-
 # Location Based search
 
 ```
@@ -160,52 +194,91 @@ Open the URL in question in Safari, allow the cert, restart Chrome, works.
 https://localhost:8080/css/app.css
 
 # ES Queries
-#
 # Event Text & Proximity Search
-#
+
 # pharse match prefix
+
 # Sorted by closets
 # Must be term "event"
-#
+```json
 GET /test_index/_search
+
 {
+
   "query": {
+
     "bool": {
+
       "must": [
+
         {
+
           "multi_match": {
+
             "query": "Qual",
+
             "type": "phrase_prefix",
+
             "fields": ["title", "type", "city", "state"]
+
           }
+
         },
+
         {
+
           "range": {
+
             "registration": {
+
               "gte": "now"
+
             }
+
           }
+
         }
+
       ],
+
       "should": [
+
         {"term": { "z_type": { "value": "event" } } }
+
       ],
+
       "minimum_should_match": 1,
+
       "filter": {
+
         "geo_distance": {
+
           "distance": "100mi",
+
           "latlon": "39.2846225,-76.7605701"
+
         }
+
       }
+
     }
+
   },
+
   "size": 200
+
 }
+
+```
+
+
+
+
 
 #
 # Venue location search
 #
-# Show venus within a 100 mile radius, sorted by closest
+# Show venues within a 100 mile radius, sorted by closest
 #
 GET /test_index/_search
 {
@@ -473,10 +546,8 @@ GET /test_index/_search
     "size": 20
 }
 
-
-#
 # Venue - Suggestion
-#
+
 https://www.freeformatter.com/json-escape.html#ad-output
 http://jsonviewer.stack.hu/
 https://github.com/elastic/ansible-elasticsearch
@@ -500,12 +571,10 @@ GET test_index/_search/template
   }
 }
 
-#
 # Event -- Suggestion
-#
+
 # Greater than now
 # Geo distance filter: 500mi
-#
 POST _scripts/event-suggestion
 {
   "script": {
@@ -525,9 +594,8 @@ GET test_index/_search/template
   }
 }
 
-#
 # Venue -- Basic Search Install @todo latlong
-#
+
 POST _scripts/venue-basic-search
 {
   "script":{
@@ -536,9 +604,8 @@ POST _scripts/venue-basic-search
   }
 }
 
-#
 # Venue -- Basic Search Usage
-#
+
 GET test_index/_search/template
 {
   "id": "venue-basic-search",
@@ -549,10 +616,37 @@ GET test_index/_search/template
     "lon": -76.7605701
   }
 }
-```
+
+
 
 # What problem are we solving?
 # What is the technical philosophy?
 
 Go back to feature branches
 /Bring back the Venue icon
+
+
+# Install Steps
+
+# Scrape data:
+# Import scraped data to database:
+# Install Elasticsearch templates: elasticsearch:installTemplates
+# Import events into Scout: php artisan scout:import "App\Event"
+# Import venues into Scout: php artisan scout:import "App\Venue"
+
+# Quick Snippets
+
+Ping Elasticsearch;
+
+```php
+use Elasticsearch\ClientBuilder;
+$client = ClientBuilder::create()->build();
+$client->ping(); // returns bool
+```
+
+Open a terminal for a container (note; only if container has bash);
+
+```dockerfile
+docker exec -it [CONTAINRER_NAME] bash
+```
+

@@ -21,5 +21,21 @@ mix.webpackConfig({
         alias: {
             '~': path.resolve(__dirname, 'resources/assets/js')
         }
+    },
+     watchOptions: {
+        ignored: /node_modules/
     }
 });
+
+module.exports.devServer = {
+    historyApiFallback: true,
+    noInfo: true,
+    compress: true,
+    quiet: true,
+    headers: {
+        'Access-Control-Allow-Origin': '*'
+    },
+    inline: true,
+    hot: true,
+    port: 44300
+};

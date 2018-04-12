@@ -4,7 +4,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 #RUN apk --no-cache add curl git subversion openssh openssl mercurial tini bash zlib-dev
 
-RUN apt-get install git
+RUN apt-get install -y git
 RUN docker-php-ext-install zip
 
 ENV COMPOSER_ALLOW_SUPERUSER 1

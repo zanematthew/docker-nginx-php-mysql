@@ -1,5 +1,6 @@
 <?php
 
+// @todo Repository pattern
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;

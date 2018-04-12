@@ -29,14 +29,14 @@ help:
 	@echo "  test                Test application"
 
 init:
-	@$(shell cp -n $(shell pwd)/web/composer.json.dist $(shell pwd)/web/composer.json 2> /dev/null)
+	@$(shell cp -n $(shell pwd)/web/src/composer.json.dist $(shell pwd)/web/src/composer.json 2> /dev/null)
 
 artisan:
 	@docker-compose exec mybmx_php \
 	php artisan $(cmd)
 
 apidoc:
-	@docker-compose exec -T php ./app/vendor/bin/apigen generate app/src --destination app/doc
+	@docker-compose exec -T php ./web/src/app/vendor/bin/apigen generate app/src --destination app/doc
 	@make resetOwner
 
 clean:
@@ -49,10 +49,16 @@ clean:
 	@rm -Rf etc/ssl/*
 
 composer-update:
-	@docker run --rm -v $(shell pwd)/web:/app mybmx_composer update
+	@docker run --rm -v $(shell pwd)/web/src:/app mybmx_composer update
 
 composer-install:
-	@docker run --rm -v $(shell pwd)/web:/app mybmx_composer install
+	@docker run --rm -v $(shell pwd)/web/src:/app mybmx_composer install
+
+bar:
+	@docker run --rm \
+		-v $(shell pwd)/web/src:/app \
+		-v $(shell pwd)/composer/cache:/root/.composer \
+		mybmx_composer $(filter-out $@,$(MAKECMDGOALS))
 
 docker-start: init
 	docker-compose up -d
@@ -62,7 +68,7 @@ docker-stop:
 	@make clean
 
 gen-certs:
-	@docker run --rm -v $(shell pwd)/etc/ssl:/certificates -e "SERVER=$(NGINX_HOST)" jacoelho/generate-certificate
+	@docker run --rm -v $(shell pwd)/web/etc/ssl:/certificates -e "SERVER=$(NGINX_HOST)" jacoelho/generate-certificate
 
 logs:
 	@docker-compose logs -f
@@ -77,7 +83,7 @@ mysql-restore:
 
 npm-install:
 	@docker run --rm -v \
-		$(shell pwd)/web:/app \
+		$(shell pwd)/web/src:/app \
 		node \
 		sh -c "cd /app ; npm install"
 
@@ -114,7 +120,7 @@ build:
 	@docker-compose build php
 	@docker-compose build composer
 
-start: build
+start:
 	@docker-compose up -d
 
 stop:

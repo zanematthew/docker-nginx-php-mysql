@@ -3,14 +3,14 @@
 .DS_Store
 
 # Application
-web/vendor
-web/node_modules
-web/public/storage
-web/.env
-web/public/css
-web/public/js
-web/public/mix-manifest.json
-web/public/build
+web/src/vendor
+web/src/node_modules
+web/src/public/storage
+web/src/.env
+web/src/public/css
+web/src/public/js
+web/src/public/mix-manifest.json
+web/src/public/build
 *.sublime*
 
 # PHPStorm
@@ -25,15 +25,17 @@ nbproject/
 /nbproject/private/private.properties
 
 # SSL Certs
-etc/ssl/
+etc/web/ssl/
 
-database/data/
+mysqldb/data
+
 elasticsearch/esdata1
 
 .idea
-web/.idea
-web/public/report
-web/report
-web/public/hot
-
+web/src/.idea
+web/src/public/report
+web/src/report
+web/src/public/hot
+web/src/node_modules
+web/src/vendor
 redis/data
