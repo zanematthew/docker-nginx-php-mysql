@@ -83,7 +83,8 @@ export default {
 
 .another-div {
   background: #f5f5f5;
-  border: solid $medium-gray;
-  border-width: 1px 0 0;
+  border-top: 1px solid $medium-gray;
+  border-left: 1px solid $light-gray;
+  border-right: 1px solid $light-gray;
 }
 </style>
