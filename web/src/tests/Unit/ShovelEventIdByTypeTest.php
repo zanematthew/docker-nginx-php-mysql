@@ -10,6 +10,11 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use App\ShovelEventIdByType;
 
+/**
+ * Class ShovelEventIdByTypeTest
+ * @package Tests\Unit
+ * @group shovel-event-by-id
+ */
 class ShovelEventIdByTypeTest extends TestCase
 {
 
@@ -39,7 +44,7 @@ class ShovelEventIdByTypeTest extends TestCase
     {
         $this->assertEquals(
             'https://www.usabmx.com/site/bmx_races?section_id=228&year=UPCOMING&past_only=0&page=1&category=NATIONAL',
-            $this->bulkEventId->url('National', 2017, 1)
+            $this->bulkEventId->url('National', date('Y'), 1)
         );
     }
 
@@ -63,7 +68,7 @@ class ShovelEventIdByTypeTest extends TestCase
     {
         $this->assertEquals(
             'https://www.usabmx.com/site/bmx_races?section_id=19&year=UPCOMING&past_only=0&page=1&series_race_type=Race+for+Life',
-            $this->bulkEventId->url('Race for Life', 2017, 1)
+            $this->bulkEventId->url('Race for Life', date('Y'), 1)
         );
     }
 
@@ -71,7 +76,7 @@ class ShovelEventIdByTypeTest extends TestCase
     {
         $this->assertEquals(
             'https://www.usabmx.com/site/bmx_races?section_id=24&year=UPCOMING&past_only=0&page=1&goldcup=1',
-            $this->bulkEventId->url('Gold Cup', 2017, 1)
+            $this->bulkEventId->url('Gold Cup', date('Y'), 1)
         );
     }
 
