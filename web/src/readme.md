@@ -13,6 +13,15 @@
 
 [Very annoying Kibana issue](https://discuss.elastic.co/t/forbidden-12-index-read-only-allow-delete-api/110282/3)
 
+# 2. App: Start
+
+Command; `docker-compose up`
+
+What this does is, create a series of service that afford the end use an ease of event and venue discovery. Our services are;
+
+* Web: SSL, web root, web config, exposing ports 80, and 443
+* PHP: Complies PHP 
+
 # 2. App: Initial Content
 
 Overview; parse webpage for relevant content; save to disk, normalize, indexed.
@@ -48,7 +57,10 @@ Using the Venue IDs file, we will iterator over the file contents and send a HTT
    1. IDs are randomly selected from the source file.
    2. Will exit if a single item fails to save
    3. As IDs are read from the source file, if they detail is saved the IDs is removed from the file
-3. Import Event Detail into Database & Index: `$ php artisan shovel:import-bulk --type=event --count=200`
+3. Import Event Detail into Database & Index: `$ php artisan shovel:import-bulk --type=event --count=200` 
+   1. Note; 
+      1. Detail file is removed after importing.
+      2. Items are Indexed into ES (if its running).
 
 ## Seeding
 

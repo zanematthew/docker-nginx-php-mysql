@@ -5,6 +5,15 @@ namespace App;
 use Laravel\Scout\Searchable;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Event
+ *
+ * @property-read mixed $slug
+ * @property-read mixed $type_name
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Schedule[] $schedules
+ * @property-read \App\Venue $venue
+ * @mixin \Eloquent
+ */
 class Event extends Model
 {
 

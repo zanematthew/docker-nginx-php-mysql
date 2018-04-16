@@ -4,6 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\City
+ *
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\State[] $states
+ * @mixin \Eloquent
+ */
 class City extends Model
 {
     protected $fillable = [
