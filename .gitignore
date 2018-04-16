@@ -39,3 +39,6 @@ web/src/public/hot
 web/src/node_modules
 web/src/vendor
 redis/data
+
+_ide_helper.php
+.phpstorm.meta.php
