@@ -10,6 +10,11 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use App\ShovelVenue;
 
+/**
+ * Class ShovelVenueEmptyNodesTest
+ * @package Tests\Unit
+ * @group shovel-venue-empty-nodes
+ */
 class ShovelVenueEmptyNodesTest extends TestCase
 {
     public function setUp()
@@ -61,6 +66,6 @@ class ShovelVenueEmptyNodesTest extends TestCase
 
     public function testParseLatLongFromMapsUri()
     {
-        $this->assertEmpty('', $this->venue->parseLatLongMapsUri());
+        $this->assertEmpty($this->venue->parseLatLongMapsUri());
     }
 }
