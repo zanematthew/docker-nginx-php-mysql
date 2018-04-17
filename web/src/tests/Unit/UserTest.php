@@ -8,6 +8,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 use Laravel\Passport\Passport;
 
+/**
+ * @group passport
+ */
 class UserTest extends TestCase
 {
 
@@ -22,6 +25,6 @@ class UserTest extends TestCase
 
         $response = $this->get('/api/user');
         $response->assertHeader('Content-Type', 'application/json');
-        $response->assertStatus(200);
+        $response->assertStatus(201);
     }
 }
