@@ -45,6 +45,7 @@ class ElasticsearchSearchTemplates
      */
     public function eventDate()
     {
+        // phpcs:disable
         return [
             'id'   => kebab_case(__FUNCTION__),
             'body' => [
@@ -54,6 +55,7 @@ class ElasticsearchSearchTemplates
                 ]
             ]
         ];
+        // phpcs:enable
     }
 
     /**
@@ -71,6 +73,7 @@ class ElasticsearchSearchTemplates
      */
     public function eventPhrase()
     {
+        // phpcs:disable
         return [
             'id'   => kebab_case(__FUNCTION__),
             'body' => [
@@ -80,6 +83,7 @@ class ElasticsearchSearchTemplates
                 ]
             ]
         ];
+        // phpcs:enable
     }
 
     /**
@@ -96,6 +100,7 @@ class ElasticsearchSearchTemplates
      */
     public function eventSuggest()
     {
+        // phpcs:disable
         return  [
             'id'   => kebab_case(__FUNCTION__),
             'body' => [
@@ -105,6 +110,7 @@ class ElasticsearchSearchTemplates
                 ]
             ]
         ];
+        // phpcs:enable
     }
 
     /**
@@ -119,6 +125,7 @@ class ElasticsearchSearchTemplates
      */
     public function venuePhrase()
     {
+        // phpcs:disable
         return [
             'id'   => kebab_case(__FUNCTION__),
             'body' => [
@@ -128,6 +135,7 @@ class ElasticsearchSearchTemplates
                 ]
             ]
         ];
+        // phpcs:enable
     }
 
     /**
@@ -142,6 +150,7 @@ class ElasticsearchSearchTemplates
      */
     public function venueSuggest()
     {
+        // phpcs:disable
         return [
             'id'   => kebab_case(__FUNCTION__),
             'body' => [
@@ -151,5 +160,6 @@ class ElasticsearchSearchTemplates
                 ]
             ]
         ];
+        // phpcs:enable
     }
 }

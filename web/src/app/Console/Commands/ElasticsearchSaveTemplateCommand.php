@@ -40,6 +40,7 @@ class ElasticsearchSaveTemplateCommand extends Command
     {
         $templates = new \App\ElasticsearchSearchTemplates;
         // @todo add update/status messages
+        // ["acknowledged" => true]
         Elasticsearch::putScript($templates->eventDate());
         Elasticsearch::putScript($templates->eventPhrase());
         Elasticsearch::putScript($templates->eventSuggest());

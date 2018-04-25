@@ -49,7 +49,7 @@ clean:
 	@rm -Rf etc/ssl/*
 
 composer-update:
-	@docker run --rm -v $(shell pwd)/web/src:/app mybmx_composer update
+	@docker run --rm -v $(shell pwd)/web/src:/app mybmx_composer update --dev
 
 composer-install:
 	@docker run --rm -v $(shell pwd)/web/src:/app mybmx_composer install
@@ -95,22 +95,22 @@ resetOwner:
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web" 2> /dev/null)
 
 phpcbf:
-	@docker-compose exec -T mybmx_php \
+	@docker-compose exec -T php \
 		./vendor/bin/phpcbf \
 		--standard=PSR2 \
 		app/
 
-# @docker-compose exec -T mybmx_php ./vendor/bin/phpcbf app/ --standard=PSR2
+# @docker-compose exec -T php ./vendor/bin/phpcbf app/ --standard=PSR2
 
 phpcs:
 	@echo "Checking the standard code..."
-	@docker-compose exec -T mybmx_php \
+	@docker-compose exec -T php \
 		./vendor/bin/phpcs \
 		--standard=PSR2 \
 		app/
 
 phpmd:
-	@docker-compose exec -T mybmx_php \
+	@docker-compose exec -T php \
 		./vendor/bin/phpmd \
 		app/ \
 		text \

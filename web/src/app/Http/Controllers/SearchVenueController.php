@@ -47,14 +47,14 @@ class SearchVenueController extends AbstractSearch
                 \Elasticsearch::searchTemplate(
                     [
                     'body' => [
-                    'id' => 'venue-suggest',
-                    'params' => [
-                    'lat'      => $lat,
-                    'lon'      => $lon,
-                    'latlon'   => $request->latlon,
-                    'distance' => 250,
-                    ]
-                    ]
+                        'id' => 'venue-suggest',
+                        'params' => [
+                            'lat'      => $lat,
+                            'lon'      => $lon,
+                            'latlon'   => $request->latlon,
+                            'distance' => 250,
+                            ]
+                        ]
                     ]
                 )
             )

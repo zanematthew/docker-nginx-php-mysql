@@ -127,6 +127,6 @@ Route::group([
         Route::get('/venue/phrase', 'SearchVenueController@phrase')->name('search.venue.phrase');
         Route::get('/venue/suggestion/', 'SearchVenueController@suggestion')->name('search.venue.suggestion');
 
-        Route::get('/place/', 'SearchPlaceController@index')->name('search.index');
+        // Route::get('/place/', 'SearchPlaceController@index')->name('search.index');
     }
 );
