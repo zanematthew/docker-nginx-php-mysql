@@ -2,8 +2,6 @@
 
 include .env
 
-# MySQL
-MYSQL_DUMPS_DIR=data/db/dumps
 
 ####
 # References:
@@ -102,13 +100,45 @@ gen-certs:
 # logs:
 # 	@docker-compose logs -f
 
+####
+# Export _all_ databases to the path/file defined in the .env file.
+#
+# @docker exec $(shell docker-compose ps -q mysqldb) \
+# 	mysqldump --all-databases \                # Begin database dump of _all_
+# 	-u "$(MYSQL_ROOT_USER)" \                  # The user name
+# 	-p "$(MYSQL_ROOT_PASSWORD)" \              # The password
+# 	> $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE) \ # Redirect output fo `mysqldump` to the desired file
+# 	2> /dev/null                               # Redirect errors to /dev/null, which discards them
+#
 mysql-dump:
+	@echo "Exporting all databases to: $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)..."
 	@mkdir -p $(MYSQL_DUMPS_DIR)
-	@docker exec $(shell docker-compose ps -q mysqldb) mysqldump --all-databases -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" > $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
+	@docker exec $(shell docker-compose ps -q mysqldb) \
+		mysqldump --all-databases \
+		-u"$(MYSQL_ROOT_USER)" \
+		-p"$(MYSQL_ROOT_PASSWORD)" \
+		> $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE) \
+		2>/dev/null
 	@make resetOwner
+	@echo "Done."
 
+####
+# Import _all_ databases from the path/file defined in the .env file.
+#
+# @docker exec -i \
+# 	$(shell docker-compose ps -q mysqldb) \
+# 	mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" \ # Connect to MySQL
+# 	< $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE) \                # Direct input from export file TO mysql
+# 	2>/dev/null                                               # Disregard any errors
+#
 mysql-restore:
-	@docker exec -i $(shell docker-compose ps -q mysqldb) mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" < $(MYSQL_DUMPS_DIR)/db.sql 2>/dev/null
+	@echo "Importing all databases from: $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)..."
+	@docker exec -i \
+		$(shell docker-compose ps -q mysqldb) \
+		mysql -u"$(MYSQL_ROOT_USER)" -p"$(MYSQL_ROOT_PASSWORD)" \
+		< $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE) \
+		2>/dev/null
+	@echo "Done."
 
 npm-install:
 	@docker run --rm -v \
