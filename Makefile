@@ -272,7 +272,6 @@ build-dev:
 	@echo "| Services are ready:"                          |
 	@echo "+-----------------------------------------------+"
 	@echo "| APP URL (https) https://mybmx.test:44300/     |"
-	@echo "| APP URL (http)  http://mybmx.test:8000/       |"
 	@echo "| MySQL           http://mybmx.test:8080/       |"
 	@echo "| Kibana Dasboard http://mybmx.test:5601/       |"
 	@echo "+-----------------------------------------------+"
