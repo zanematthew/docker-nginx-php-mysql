@@ -1,44 +1,5 @@
 .DEFAULT_GOAL := help
 
-include .env
-
-
-####
-# References:
-# 	https://php.earth/docs/interop/make
-# 	https://docs.docker.com/engine/reference/run/
-# 	https://docs.docker.com/compose/reference/up/
-# 	https://docs.docker.com/compose/reference/down/
-# 	https://docs.docker.com/compose/reference/exec/
-#
-# We can't use this neat auto generator for
-# help commands because including the .env file
-# shows "Makefile" for all targets
-# help:
-	# @echo "\033[33mUsage:\033[0m\n  make [target] [arg=\"val\"...]\n\n\033[33mTargets:\033[0m"
-	# @grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[32m%-15s\033[0m %s\n", $$1, $$2}'
-
-help:
-	@echo ""
-	@echo "Usage:"
-	@echo "  make [target] [arg=\"val\"...]"
-	@echo ""
-	@echo "Commands:"
-	@echo "  artisan             Laravel Artisan"
-# 	@echo "  apidoc              Generate documentation of API"
-# 	@echo "  build               Build application images"
-	@echo "  phpcs               Check the API with PHP Code Sniffer (PSR2)"
-	@echo "  phpmd               The ever so annoying, but fun PHP Mess Detecor"
-	@echo "  phpcbf              Fix dat sh!t."
-	@echo "  start               Start the app (launch docker-compose in detached mode)."
-	@echo "  stop                Stop the app (stop docker-compose, and remove any volumes)."
-# 	@echo "  clean               Clean directories for reset"
-# 	@echo "  gen-certs           Generate SSL certificates"
-# 	@echo "  logs                Follow log output"
-# 	@echo "  mysql-dump          Create backup of whole database"
-# 	@echo "  mysql-restore       Restore backup from whole database"
-# 	@echo "  test                Test application"
-
 ####
 #
 # Allow us to pass arguments from
@@ -61,6 +22,44 @@ help:
 #
 .PHONY: *
 
+include .env
+
+####
+# References:
+# 	https://php.earth/docs/interop/make
+# 	https://docs.docker.com/engine/reference/run/
+# 	https://docs.docker.com/compose/reference/up/
+# 	https://docs.docker.com/compose/reference/down/
+# 	https://docs.docker.com/compose/reference/exec/
+#
+# We can't use this neat auto generator for
+# help commands because including the .env file
+# shows "Makefile" for all targets
+# help:
+# @echo "\033[33mUsage:\033[0m\n  make [target] [arg=\"val\"...]\n\n\033[33mTargets:\033[0m"
+# @grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[32m%-15s\033[0m %s\n", $$1, $$2}'
+
+help:
+	@echo ""
+	@echo "Usage:"
+	@echo "  make [target] [arg=\"val\"...]"
+	@echo ""
+	@echo "Commands:"
+	@echo "  artisan             Laravel Artisan"
+# 	@echo "  apidoc              Generate documentation of API"
+# 	@echo "  build               Build application images"
+	@echo "  phpcs               Check the API with PHP Code Sniffer (PSR2)"
+	@echo "  phpmd               The ever so annoying, but fun PHP Mess Detecor"
+	@echo "  phpcbf              Fix dat sh!t."
+	@echo "  start               Start the app (launch docker-compose in detached mode)."
+	@echo "  stop                Stop the app (stop docker-compose, and remove any volumes)."
+# 	@echo "  clean               Clean directories for reset"
+# 	@echo "  gen-certs           Generate SSL certificates"
+# 	@echo "  logs                Follow log output"
+	@echo "  mysql-dump          Create backup of all databases."
+	@echo "  mysql-restore       Restore backup from all databases."
+# 	@echo "  test                Test application"
+
 artisan:
 	@docker-compose exec php \
 	php artisan $(arg)
@@ -78,12 +77,11 @@ artisan:
 # 	@rm -Rf web/report
 # 	@rm -Rf etc/ssl/*
 
-
 composer:
 	@docker run --rm \
 		-v $(shell pwd)/web/src:/app \
 		-v $(shell pwd)/composer/cache:/root/.composer \
-		mybmx_composer $(arg)
+		$(APP_NAME)_composer $(arg)
 
 start:
 	docker-compose up -d
@@ -140,14 +138,17 @@ mysql-restore:
 		2>/dev/null
 	@echo "Done."
 
-npm-install:
+npm:
 	@docker run --rm -v \
 		$(shell pwd)/web/src:/app \
-		node \
-		sh -c "cd /app ; npm install"
+		$(APP_NAME)_node \
+		sh -c "cd /app ; npm $(arg)"
 
-test: phpcs
-	@docker-compose exec -T php ./vendor/bin/phpunit --colors=always --configuration ./
+test:
+	@docker-compose exec -T \
+		php ./vendor/bin/phpunit \
+		--colors=always \
+		--configuration ./
 	@make resetOwner
 
 resetOwner:
@@ -220,4 +221,58 @@ build:
 	@docker-compose build php
 	@docker-compose build composer
 
-# docker run --rm -v /Users/zanekolnik/Documents/docker-nginx-php-mysql/web:/app node sh -c "cd /app ; npm run production"
+build-dev:
+	@echo "+-----------------------------------------------+"
+	@echo "| Attempting to build services                  |"
+	@echo "+-----------------------------------------------+"
+	@docker-compose build
+	@echo "+-----------------------------------------------+"
+	@echo "| Starting services                             |"
+	@echo "+-----------------------------------------------+"
+	@docker-compose up -d
+	## Pull the repo
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing server-side dependencies           |"
+	@echo "+-----------------------------------------------+"
+	@make composer arg="install"
+	@echo "+-----------------------------------------------+"
+	@echo "| Verifying coding standards                    |"
+	@echo "+-----------------------------------------------+"
+	@make phpcs
+	@echo "+-----------------------------------------------+"
+	@echo "| Verifying test                                |"
+	@echo "+-----------------------------------------------+"
+	# @make test
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing database                           |"
+	@echo "+-----------------------------------------------+"
+	@make artisan arg="migrate"
+	## @make artisan arg="passport:install"
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing Elasticsearch search index pattern |"
+	@echo "+-----------------------------------------------+"
+	@make artisan arg="elasticsearch:install"
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing Elasticsearch templates            |"
+	@echo "+-----------------------------------------------+"
+	@make artisan arg="elasticsearch:installTemplate"
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing front-end dependencies             |"
+	@echo "+-----------------------------------------------+"
+	@make npm arg="install"
+	@echo "+-----------------------------------------------+"
+	@echo "| Turning on dev                                |"
+	@echo "+-----------------------------------------------+"
+	@make npm arg="run dev"
+	@echo "+-----------------------------------------------+"
+	@echo "| Available commands                            |"
+	@echo "+-----------------------------------------------+"
+	@make help
+	@echo "+-----------------------------------------------+"
+	@echo "| Services are ready:"                          |
+	@echo "+-----------------------------------------------+"
+	@echo "| APP URL (https) https://mybmx.test:44300/     |"
+	@echo "| APP URL (http)  http://mybmx.test:8000/       |"
+	@echo "| MySQL           http://mybmx.test:8080/       |"
+	@echo "| Kibana Dasboard http://mybmx.test:5601/       |"
+	@echo "+-----------------------------------------------+"

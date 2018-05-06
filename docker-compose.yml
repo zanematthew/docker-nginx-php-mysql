@@ -41,6 +41,9 @@ services:
     build:
       context: ./composer
     container_name: ${APP_NAME}_composer
+    volumes:
+      - "./web/src:/app"
+      - "./composer/cache:/root/.composer"
   myadmin:
     image: phpmyadmin/phpmyadmin
     container_name: ${APP_NAME}_phpmyadmin
@@ -69,7 +72,10 @@ services:
       - "./mysqldb/data/db/mysql:/var/lib/mysql"
     networks:
       - mybmx_network
-
+  node:
+    build:
+      context: ./node
+    container_name: ${APP_NAME}_node
 # This is available at;
 # http://localhost:5601/app/kibana
 # Note; it does take time for ES/Kiabana to start
