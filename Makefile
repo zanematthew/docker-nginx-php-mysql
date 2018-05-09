@@ -188,13 +188,6 @@ reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-
 resetOwner: ## Reset the owner and group for /etc/ssl, and /web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web" 2> /dev/null)
 
-start:
-	docker-compose up -d
-
-stop:
-	@docker-compose down -v
-	# @make clean
-
 test: ## Test the codebase and generate a code coverage report.
 	@echo "Performing testing..."
 	@docker-compose exec -T \
