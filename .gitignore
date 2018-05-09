@@ -25,7 +25,8 @@ nbproject/
 /nbproject/private/private.properties
 
 # SSL Certs
-etc/web/ssl/
+web/etc/ssl/
+web/etc/nginx/default.conf
 
 mysqldb/data
 
@@ -42,3 +43,4 @@ redis/data
 
 _ide_helper.php
 .phpstorm.meta.php
+
