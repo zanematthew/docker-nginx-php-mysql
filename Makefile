@@ -102,15 +102,57 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@make help
 	@echo "+-----------------------------------------------+"
-	@echo "| Services are ready:"                          |
+	@echo "| Services are ready:                           |"
 	@echo "+-----------------------------------------------+"
-	@echo "| APP URL (https) https://mybmx.test:44300/     |"
-	@echo "| MySQL           http://mybmx.test:8080/       |"
-	@echo "| Kibana Dasboard http://mybmx.test:5601/       |"
+	@echo "| APP URL (https) https://$(NGINX_HOST):44300/	|"
+	@echo "| MySQL           http://$(NGINX_HOST):8080/ 	|"
+	@echo "| Kibana Dasboard http://$(NGINX_HOST):5601/ 	|"
 	@echo "+-----------------------------------------------+"
 
 build-prod: ## Build production ready app.
-	@echo "TODO"
+	@echo "+-----------------------------------------------+"
+	@echo "| Building development ready environment        |"
+	@echo "+-----------------------------------------------+"
+	@docker-compose build
+	@echo "+-----------------------------------------------+"
+	@echo "| Starting services                             |"
+	@echo "+-----------------------------------------------+"
+	@docker-compose up -d
+	# Pull the repo
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing server-side dependencies           |"
+	@echo "+-----------------------------------------------+"
+	@make composer arg="install"
+	@echo "+-----------------------------------------------+"
+	@echo "| Verifying coding standards                    |"
+	@echo "+-----------------------------------------------+"
+	@make phpcs
+	@echo "+-----------------------------------------------+"
+	@echo "| Verifying test                                |"
+	@echo "+-----------------------------------------------+"
+	@make test
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing database                           |"
+	@echo "+-----------------------------------------------+"
+	@make artisan arg="migrate"
+	# @make artisan arg="passport:install"
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing Elasticsearch search index pattern |"
+	@echo "+-----------------------------------------------+"
+	@make artisan arg="elasticsearch:install"
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing Elasticsearch templates            |"
+	@echo "+-----------------------------------------------+"
+	@make artisan arg="elasticsearch:installTemplate"
+	@echo "+-----------------------------------------------+"
+	@echo "| Installing front-end production dependencies  |"
+	@echo "+-----------------------------------------------+"
+	@make npm arg="install --production"
+	@echo "+-----------------------------------------------+"
+	@echo "| Turning on dev                                |"
+	@echo "+-----------------------------------------------+"
+	@make npm arg="run production"
+	@echo "Done."
 
 composer: ## Composer, for PHP.
 	@docker run --rm \
