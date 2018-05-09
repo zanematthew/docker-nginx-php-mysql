@@ -56,7 +56,7 @@ build:
 
 build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
-	@echo "| Attempting to build services                  |"
+	@echo "| Building development ready environment        |"
 	@echo "+-----------------------------------------------+"
 	@docker-compose build
 	@echo "+-----------------------------------------------+"
@@ -75,7 +75,7 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@echo "| Verifying test                                |"
 	@echo "+-----------------------------------------------+"
-	# @make test
+	@make test
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing database                           |"
 	@echo "+-----------------------------------------------+"
@@ -109,14 +109,8 @@ build-dev: ## Build the development environment.
 	@echo "| Kibana Dasboard http://mybmx.test:5601/       |"
 	@echo "+-----------------------------------------------+"
 
-# clean:
-# 	@rm -Rf data/db/mysql/*
-# 	@rm -Rf $(MYSQL_DUMPS_DIR)/*
-# 	@rm -Rf web/vendor
-# 	@rm -Rf web/composer.lock
-# 	@rm -Rf web/doc
-# 	@rm -Rf web/report
-# 	@rm -Rf etc/ssl/*
+build-prod: ## Build production ready app.
+	@echo "TODO"
 
 composer: ## Composer, for PHP.
 	@docker run --rm \
@@ -128,6 +122,9 @@ gen-certs:
 	@docker run --rm \
 	-v $(shell pwd)/web/etc/ssl:/certificates \
 	-e "SERVER=$(NGINX_HOST)" jacoelho/generate-certificate
+
+install: ## Install; build images(?), ssl, dependencies
+	@echo "TODO"
 
 mysql-dump: ## Export all databases to the path/file defined in the .env file.
 	@echo "Exporting all databases to: $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)..."
@@ -180,7 +177,18 @@ phpmd: ## Check our code for messy-ness.
 		text \
 		cleancode,codesize,controversial,design,naming,unusedcode
 
-resetOwner:
+reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
+	@rm -Rf mysqldb/data
+	@rm -Rf elasticsearch/esdata1/*
+	@rm -Rf redis/data
+	@rm -Rf $(MYSQL_DUMPS_DIR)/*
+	@rm -Rf web/src/node_modules
+	@rm -Rf web/src/vendor
+	@rm -Rf web/phpunit
+	@rm -Rf web/etc/nginx/default.conf
+	@rm -Rf web/etc/ssl/*
+
+resetOwner: ## Reset the owner and group for /etc/ssl, and /web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web" 2> /dev/null)
 
 start:
