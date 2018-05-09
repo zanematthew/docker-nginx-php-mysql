@@ -104,9 +104,10 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@echo "| Services are ready:                           |"
 	@echo "+-----------------------------------------------+"
-	@echo "| APP URL (https) https://$(NGINX_HOST):44300/	|"
-	@echo "| MySQL           http://$(NGINX_HOST):8080/ 	|"
-	@echo "| Kibana Dasboard http://$(NGINX_HOST):5601/ 	|"
+	@echo "| APP URL         https://$(NGINX_HOST):44300/"
+	@echo "| MySQL Dashboard http://$(NGINX_HOST):8080/"
+	@echo "| Kibana Dasboard http://$(NGINX_HOST):5601/"
+	@echo "| PHPUnit Report  https://${NGINX_HOST}/phpunit/index.html"
 	@echo "+-----------------------------------------------+"
 
 build-prod: ## Build production ready app.
