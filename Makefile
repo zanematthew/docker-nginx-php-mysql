@@ -190,9 +190,11 @@ stop:
 	@docker-compose down -v
 	# @make clean
 
-test:
+test: ## Test the codebase and generate a code coverage report.
+	@echo "Performing testing..."
 	@docker-compose exec -T \
 		php ./vendor/bin/phpunit \
 		--colors=always \
 		--configuration ./
 	@make resetOwner
+	@echo "Report available at ${NGINX_HOST}/phpunit"
