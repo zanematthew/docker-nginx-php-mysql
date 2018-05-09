@@ -182,9 +182,6 @@ reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-
 	@rm -Rf elasticsearch/esdata1/*
 	@rm -Rf redis/data
 	@rm -Rf $(MYSQL_DUMPS_DIR)/*
-	@rm -Rf web/src/node_modules
-	@rm -Rf web/src/vendor
-	@rm -Rf web/phpunit
 	@rm -Rf web/etc/nginx/default.conf
 	@rm -Rf web/etc/ssl/*
 
