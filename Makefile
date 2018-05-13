@@ -37,7 +37,7 @@ include .env
 help:
 	@echo "\033[33mUsage:\033[0m\n  make [target] [arg=\"val\"...]\n\n\033[33mTargets:\033[0m"
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
-	printf "\033[36m%-30s\033[0m %s\n", $$1, $$NF \
+	printf "  \033[36m%-30s\033[0m %s\n", $$1, $$NF \
 	}' $(MAKEFILE_LIST)
 
 include .env
@@ -45,6 +45,34 @@ include .env
 artisan: ## Laravel's artisan command.
 	@docker-compose exec php \
 	php artisan $(arg)
+
+app-info: ## Display info such as; URLs, DB connection, etc.
+	@echo "App Name            : $(APP_NAME)"
+	@echo "---"
+	@echo "APP URL             : https://$(NGINX_HOST):44300/"
+	@echo "MySQL Dashboard     : http://$(NGINX_HOST):8080/"
+	@echo "Kibana Dasboard     : http://$(NGINX_HOST):5601/"
+	@echo "PHPUnit Report      : https://${NGINX_HOST}/phpunit/index.html"
+	@echo "---"
+	@echo "Host                : $(NGINX_HOST)"
+	@echo "---"
+	@echo "PHP Version         : $(PHP_VERSION)"
+	@echo "---"
+	@echo "MySQL Host          : $(MYSQL_HOST)"
+	@echo "MySQL DB            : $(MYSQL_DATABASE)"
+	@echo "MySQL Root User     : $(MYSQL_ROOT_USER)"
+	@echo "MySQL Root Password : $(MYSQL_ROOT_PASSWORD)"
+	@echo "MySQL User          : $(MYSQL_USER)"
+	@echo "MySQL Password      : $(MYSQL_PASSWORD)"
+	@echo "MySQL Dumps         : $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)"
+	@echo "---"
+	@echo "Elasticsearch       : http://elasticsearch:9200"
+	@echo "---"
+	@echo "Redis Host          : redis"
+	@echo "Redis Password      : "
+	@echo "Redis Port          : 6379"
+	@echo "---"
+	@echo "App source Dir      : $(APP_SRC_DIR)"
 
 # apidoc:
 # 	@docker-compose exec -T php ./web/src/app/vendor/bin/apigen generate app/src --destination app/doc
@@ -102,13 +130,9 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@make help
 	@echo "+-----------------------------------------------+"
-	@echo "| Services are ready:                           |"
+	@echo "| Available Services:                           |"
 	@echo "+-----------------------------------------------+"
-	@echo "| APP URL         https://$(NGINX_HOST):44300/"
-	@echo "| MySQL Dashboard http://$(NGINX_HOST):8080/"
-	@echo "| Kibana Dasboard http://$(NGINX_HOST):5601/"
-	@echo "| PHPUnit Report  https://${NGINX_HOST}/phpunit/index.html"
-	@echo "+-----------------------------------------------+"
+	@make app-info
 
 build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
