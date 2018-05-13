@@ -4,11 +4,10 @@
 
 # Sublime
 *.sublime*
+_ide_helper.php
 
 # PHPStorm
 .idea
-
-_ide_helper.php
 .phpstorm.meta.php
 
 services/web/etc/ssl/
