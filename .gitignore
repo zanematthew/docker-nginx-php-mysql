@@ -2,45 +2,20 @@
 .*.swp
 .DS_Store
 
-# Application
-web/src/vendor
-web/src/node_modules
-web/src/public/storage
-web/src/.env
-web/src/public/css
-web/src/public/js
-web/src/public/mix-manifest.json
-web/src/public/build
+# Sublime
 *.sublime*
 
 # PHPStorm
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/dictionaries
-
-# Netbeans
-nbproject/
-/nbproject/
-/nbproject/private/
-/nbproject/private/private.properties
-
-# SSL Certs
-web/etc/ssl/
-web/etc/nginx/default.conf
-
-mysqldb/data
-
-elasticsearch/esdata1
-
 .idea
-web/src/.idea
-web/src/public/report
-web/src/report
-web/src/public/hot
-web/src/node_modules
-web/src/vendor
-redis/data
 
 _ide_helper.php
 .phpstorm.meta.php
 
+services/web/etc/ssl/
+services/web/etc/nginx/default.conf
+services/mysqldb/data
+services/elasticsearch/esdata1
+services/redis/data
+
+data/db/
+src/

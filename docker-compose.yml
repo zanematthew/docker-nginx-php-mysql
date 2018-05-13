@@ -2,11 +2,11 @@ version: '3'
 services:
   composer:
     build:
-      context: ./composer
+      context: ./services/composer
     container_name: ${APP_NAME}_composer
     volumes:
-      - "./web/src:/app"
-      - "./composer/cache:/root/.composer"
+      - "./src:/app"
+      - "./services/composer/cache:/root/.composer"
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
     container_name: ${APP_NAME}_elasticsearch
@@ -18,8 +18,8 @@ services:
         soft: -1
         hard: -1
     volumes:
-      - "./elasticsearch/esdata1:/usr/share/elasticsearch/data"
-      - "./elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
+      - "./services/elasticsearch/esdata1:/usr/share/elasticsearch/data"
+      - "./services/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
     ports:
       - 9200:9200
     networks:
@@ -28,7 +28,7 @@ services:
     image: docker.elastic.co/kibana/kibana:6.2.2
     container_name: ${APP_NAME}_kibana
     volumes:
-      - ./kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./services/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - 5601:5601
     networks:
@@ -58,21 +58,21 @@ services:
     ports:
       - "8989:3306"
     volumes:
-      - "./mysqldb/data/db/mysql:/var/lib/mysql"
+      - "./services/mysqldb/data/db/mysql:/var/lib/mysql"
     networks:
       - ${APP_NAME}_network
   node:
     build:
-      context: ./node
+      context: ./services/node
     container_name: ${APP_NAME}_node
   php:
     build:
-      context: ./php-fpm
+      context: ./services/php-fpm
     container_name: ${APP_NAME}_php
     restart: always
     volumes:
-      - "./web/etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
-      - "./web/src:/var/www/html"
+      - "./services/web/etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
+      - "./src:/var/www/html"
     networks:
       - ${APP_NAME}_network
   redis:
@@ -81,7 +81,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - "./redis/data:/data"
+      - "./services/redis/data:/data"
     restart: always
     networks:
       - ${APP_NAME}_network
@@ -89,10 +89,10 @@ services:
     image: nginx:alpine
     container_name: ${APP_NAME}_web
     volumes:
-      - "./web/etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
-      - "./web/etc/ssl:/etc/ssl"
-      - "./web/src:/var/www/html"
-      - "./web/etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
+      - "./services/web/etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
+      - "./services/web/etc/ssl:/etc/ssl"
+      - "./src:/var/www/html"
+      - "./services/web/etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
     ports:
       - "44300:443"
     environment:

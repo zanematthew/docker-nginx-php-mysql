@@ -52,7 +52,7 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "APP URL             : https://$(NGINX_HOST):44300/"
 	@echo "MySQL Dashboard     : http://$(NGINX_HOST):8080/"
 	@echo "Kibana Dasboard     : http://$(NGINX_HOST):5601/"
-	@echo "PHPUnit Report      : https://${NGINX_HOST}/phpunit/index.html"
+	@echo "PHPUnit Report      : https://${NGINX_HOST}:44300/phpunit/index.html"
 	@echo "---"
 	@echo "Host                : $(NGINX_HOST)"
 	@echo "---"
@@ -75,7 +75,7 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "App source Dir      : $(APP_SRC_DIR)"
 
 # apidoc:
-# 	@docker-compose exec -T php ./web/src/app/vendor/bin/apigen generate app/src --destination app/doc
+# 	@docker-compose exec -T php ./services/web/src/app/vendor/bin/apigen generate app/src --destination app/doc
 # 	@make resetOwner
 
 build:
@@ -181,13 +181,13 @@ build-prod: ## Build production ready app.
 
 composer: ## Composer, for PHP.
 	@docker run --rm \
-		-v $(shell pwd)/web/src:/app \
-		-v $(shell pwd)/composer/cache:/root/.composer \
+		-v $(shell pwd)/src:/app \
+		-v $(shell pwd)/services/composer/cache:/root/.composer \
 		$(APP_NAME)_composer $(arg)
 
 gen-certs:
 	@docker run --rm \
-	-v $(shell pwd)/web/etc/ssl:/certificates \
+	-v $(shell pwd)/services/web/etc/ssl:/certificates \
 	-e "SERVER=$(NGINX_HOST)" jacoelho/generate-certificate
 
 install: ## Install; build images(?), ssl, dependencies
@@ -216,7 +216,7 @@ mysql-restore: ## Import all databases from the path/file defined in the .env fi
 
 npm:
 	@docker run --rm -v \
-		$(shell pwd)/web/src:/app \
+		$(shell pwd)/src:/app \
 		$(APP_NAME)_node \
 		sh -c "cd /app ; npm $(arg)"
 
@@ -245,15 +245,15 @@ phpmd: ## Check our code for messy-ness.
 		cleancode,codesize,controversial,design,naming,unusedcode
 
 reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
-	@rm -Rf mysqldb/data
-	@rm -Rf elasticsearch/esdata1/*
-	@rm -Rf redis/data
+	@rm -Rf services/mysqldb/data
+	@rm -Rf services/elasticsearch/esdata1/*
+	@rm -Rf services/redis/data
 	@rm -Rf $(MYSQL_DUMPS_DIR)/*
-	@rm -Rf web/etc/nginx/default.conf
-	@rm -Rf web/etc/ssl/*
+	@rm -Rf services/web/etc/nginx/default.conf
+	@rm -Rf services/web/etc/ssl/*
 
-resetOwner: ## Reset the owner and group for /etc/ssl, and /web/src
-	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/web" 2> /dev/null)
+resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
+	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)
 
 test: ## Test the codebase and generate a code coverage report.
 	@echo "Performing testing..."
