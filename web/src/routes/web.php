@@ -1,5 +1,13 @@
 <?php
 
+// Passport,
+// Visit this URL,
+// Create "personal access token"
+// This is then used in Postman as the "Bearer".
+// eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjE5ZWJmZGJhNTQ0NjZjZmM3MzZhMDMyMmU3YmRiZjA2OTM0ZDhmYTFhMThmYzg4OTZkZjI4MjQzYjkxYWY0OTg5NzQ4OGYzNWNmOTI1ZjQwIn0.eyJhdWQiOiI2IiwianRpIjoiMTllYmZkYmE1NDQ2NmNmYzczNmEwMzIyZTdiZGJmMDY5MzRkOGZhMWExOGZjODg5NmRmMjgyNDNiOTFhZjQ5ODk3NDg4ZjM1Y2Y5MjVmNDAiLCJpYXQiOjE1MjM5MzMwMjYsIm5iZiI6MTUyMzkzMzAyNiwiZXhwIjoxNTU1NDY5MDI2LCJzdWIiOiIzIiwic2NvcGVzIjpbXX0.I1BNHNPvMgaer5haoMEAkQTiXdxvYwjSgzw0f0k2PtNJ7YtBx9OS_cr0L9EkcEwNz6q01iFXQUrE5vMXSpW1bl0xhujCcC_DWzUbPBDbfxCaABZEetHnp_PQ6XHmDuBix6i04mGj4svzZ-P8m1j3rbvoVZnWiwQEMtAT-5qwnNHXa8DtwTAWlm1EaNjNrUgJruCnVku16GNFg0BPKoDmdTa-o_1P7rCvpuMO7CFrj2fTAve_tTAqrY7oamVcBt-aR3tpwNXgtfem3a6fUOZQEA_TyPo6B6Keka4f9lCIEoO0cTcuiws-lq8IOvxsaA6DO4N44j6i1qOcWf-wyE87t-T48b_CcG8sbbTDTlwdk44tRwlffTh-QO_NnVidq01vr83b0GHFWVKtBHQiwNl7sRtsA1u-4E-e948B0r7qZ2joUb2Esm4z_8OVJLzVIx33Yip5pfXNYLyBS1Xc2SoZGon-2vi_0N5uUBcuWPuM71QobHrIVc5KvAJ-lodBK0TGgqqDfOr5OFyjpmoUSqgPwnDYMet3ckFQpTkAnuUfodn24vURa6HacDCcS4Dm9qU-qnm92AcG-86Znld0i7susKsGtBXKOenBnn8_QY1HawjowRHaco-0saQr3HsfYo251Ew8hj8cheTBM0BoYkvx3lwQIl4VplfdMHBdsNnfH7k
+Route::view('/home', 'home');
+
+
 Route::get('/db', function () {
     try {
         $dsn = 'mysql:host=mysqldb;dbname=test;charset=utf8;port=3306';

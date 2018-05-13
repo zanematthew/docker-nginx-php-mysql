@@ -1,30 +1,31 @@
 # 1. App: Install
 
-1. Install server-side dependenceis `$ composer install`
-2. Install front-end dependencies `$ npm install`
-3. Run migrations `$ php artisan migrate`
-4. Install Elasticsearch [Index Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html) `$ php artisan elasticsearch:install`
-5. Install Elasticsearch [Templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html) `$ php artisan elasticsearch:installTemplates`
-6. Import Venues & Events into MySQL database `$ php artisan shovel:import-bulk`
-7. Index Venues `$ php artisan scout:import "App\Venue"`
-8. Index Events `$ php artisan scout:import "App\Venue"`
+1. Install server-side dependencies `$ composer install`
+2. Create db tables: `php artisan migrate`
+3. Install 1st party: Scout;
+   1. Publish configuration* use queue drive
+4. Configure: Passport
+   1. Create encryption keys: `php artisan passport:install`
+   2. Generate encryption keys: `php artisan passport:keys`
+5. Configure: Socialite * see stateless for later, nothing to do here, managed via composer and php artisan migration
+6. Install Elasticsearch [Index Mapping](https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html) `$ php artisan elasticsearch:install`
+7. Install Elasticsearch [Templates](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-template.html) `$ php artisan elasticsearch:installTemplates`
+8. Install front-end dependencies `$ npm install`
 9. Build compile assets `$ npm run production`
-10. App available at; `https://localhost:3000`
+10. App available at; `https://mybmx.test:44300`
 
 [Very annoying Kibana issue](https://discuss.elastic.co/t/forbidden-12-index-read-only-allow-delete-api/110282/3)
 
-# 2. App: Start
-
-Command; `docker-compose up`
-
-What this does is, create a series of service that afford the end use an ease of event and venue discovery. Our services are;
-
-* Web: SSL, web root, web config, exposing ports 80, and 443
-* PHP: Complies PHP 
-
 # 2. App: Initial Content
 
-Overview; parse webpage for relevant content; save to disk, normalize, indexed.
+### Generate Content
+
+1. Seed/scrape?
+2. Import Venues & Events into MySQL database `$ php artisan shovel:import-bulk`
+3. Index Venues `$ php artisan scout:import "App\Venue"`
+4. Index Events `$ php artisan scout:import "App\Venue"`
+
+Overview; parse webpage for relevant content; save to disk, normalize, index.
 
 End goal is;
 
@@ -62,30 +63,10 @@ Using the Venue IDs file, we will iterator over the file contents and send a HTT
       1. Detail file is removed after importing.
       2. Items are Indexed into ES (if its running).
 
+
 ## Seeding
 
-# Models
-
-All Models are defined using the [`php artsian make:model <Model>`](https://laravel.com/docs/5.4/eloquent#defining-models) command.
-
-This application has the following models:
-
-    * City
-        * One City belongs to many States
-    * State
-        * One State has many Cities
-    * Event
-        * Many Events belongs to many Schedules
-        * One Event belongs to one Venue
-    * Venue
-        * One Venue has many Events
-        * One Venue belongs to one City
-    * Schedule
-        * Many Schedules belongs to one user
-    * User
-        * One User has many Schedules
-
-## Model Factories
+### Model Factories
 
 Test data generated with [Faker](https://github.com/fzaninotto/Faker) will result in strange scenarios, i.e., Event start and end dates will date back into the 1900's.
 
@@ -103,7 +84,7 @@ A fake Schedule will create a fake Event, along with needed relations.
 
 `factory(App\EventSchedule::class)->create();`
 
-# Routes
+# 3. Routes
 
 ## API Routes
 
@@ -135,8 +116,8 @@ http://mybmx.events/events/{year}/{month}/{type}/{state?}
 
 **Links**
 
-* [Laravel Routes Documentation](https://laravel.com/docs/5.4/routing).
-* List routes `php artisan route:list`.
+- [Laravel Routes Documentation](https://laravel.com/docs/5.4/routing).
+- List routes `php artisan route:list`.
 
 ## Events
 
@@ -168,12 +149,26 @@ Plus state abbr
 `schedule/<id>/edit`
 `schedule/<id>/add/<event id>/`
 
-### Login, Register, Socialite
+# Models
 
-# Testing
+All Models are defined using the [`php artsian make:model <Model>`](https://laravel.com/docs/5.4/eloquent#defining-models) command.
 
-`.env`, DB_DATABASE_TEST mysql_testing
-`config/database.php`
+This application has the following models:
+
+    * City
+        * One City belongs to many States
+    * State
+        * One State has many Cities
+    * Event
+        * Many Events belongs to many Schedules
+        * One Event belongs to one Venue
+    * Venue
+        * One Venue has many Events
+        * One Venue belongs to one City
+    * Schedule
+        * Many Schedules belongs to one user
+    * User
+        * One User has many Schedules
 
 # Location Based search
 
@@ -206,19 +201,12 @@ Open the URL in question in Safari, allow the cert, restart Chrome, works.
 https://localhost:8080/css/app.css
 
 # ES Queries
-# Event Text & Proximity Search
+Event Text & Proximity Search, pharse match prefix, Sorted by closets, Must be term "event"
 
-# pharse match prefix
-
-# Sorted by closets
-# Must be term "event"
 ```json
 GET /test_index/_search
-
 {
-
   "query": {
-
     "bool": {
 
       "must": [
@@ -280,54 +268,80 @@ GET /test_index/_search
   "size": 200
 
 }
+```
+
+# Venue location search
+# Show venues within a 100 mile radius, sorted by closest
+# Venue Text search
+```
+GET /test_index/_search
+
+{
+
+  "query": {
+
+    "bool": {
+
+      "must": [
+
+        { "match_all": {} }
+
+      ],
+
+      "filter": {
+
+        "geo_distance": {
+
+          "distance": "100mi",
+
+          "latlon": "39.2846225,-76.7605701"
+
+        }
+
+      },
+
+      "should": [
+
+        { "term": {
+
+          "z_type": {
+
+            "value": "venue"
+
+          }
+
+        }}
+
+      ],
+
+      "minimum_should_match": 1
+
+    }
+
+  },
+
+  "sort": [
+
+    {
+
+      "_geo_distance": {
+
+        "latlon": "39.2846225,-76.7605701",
+
+        "order": "asc"
+
+      }
+
+    }
+
+  ]
+
+}
 
 ```
 
 
 
-
-
-#
-# Venue location search
-#
-# Show venues within a 100 mile radius, sorted by closest
-#
-GET /test_index/_search
-{
-  "query": {
-    "bool": {
-      "must": [
-        { "match_all": {} }
-      ],
-      "filter": {
-        "geo_distance": {
-          "distance": "100mi",
-          "latlon": "39.2846225,-76.7605701"
-        }
-      },
-      "should": [
-        { "term": {
-          "z_type": {
-            "value": "venue"
-          }
-        }}
-      ],
-      "minimum_should_match": 1
-    }
-  },
-  "sort": [
-    {
-      "_geo_distance": {
-        "latlon": "39.2846225,-76.7605701",
-        "order": "asc"
-      }
-    }
-  ]
-}
-
-#
-# Venue Text search
-#
 # Search in; name
 #
 GET /test_index/_search
@@ -558,19 +572,23 @@ GET /test_index/_search
     "size": 20
 }
 
-# Venue - Suggestion
+# Elasticsearch: Venue - Suggestion
 
 https://www.freeformatter.com/json-escape.html#ad-output
 http://jsonviewer.stack.hu/
 https://github.com/elastic/ansible-elasticsearch
 https://fostermade.co/blog/testing-elasticsearch-and-simplifying-query-building
-POST _scripts/venue-suggestion
+
+```POST _scripts/venue-suggestion
 {
   "script": {
     "lang": "mustache",
-    "source": "{\"query\":{\"bool\":{\"must\":[{\"match_all\":{}}],\"filter\":{\"geo_distance\":{\"distance\":\"{{distance}}mi\",\"latlon\":\"{{#join}}latlon{{\/join}}\"}},\"should\":[{\"term\":{\"z_type\":{\"value\":\"venue\"}}}],\"minimum_should_match\":1}},\"sort\":[{\"_geo_distance\":{\"latlon\":\"{{#join}}latlon{{\/join}}\",\"order\":\"asc\"}}],\"_source\":true,\"script_fields\":{\"distance_from\":{\"script\":{\"source\":\"doc['latlon'].arcDistance(params.lat,params.lon) * 0.001\",\"lang\":\"painless\",\"params\":{\"lat\":{{lat}},\"lon\":{{lon}}}}}}}"
+    "source": "{\"query\":{\"bool\":{\"must\":[{\"match_all\":{}}],\"filter\":{\"geo_distance\":{\"distance\":\"{{distance}}mi\",\"latlon\":\"{{#join}}latlon{{\/join}}\"}},\"should\":[{\"term\":{\"z_type\":{\"value\":\"venue\"}}}],\"minimum_should_match\":1}},\"sort\":[{\"geo_distance\":{\"latlon\":\"{{#join}}latlon{{\/join}}\",\"order\":\"asc\"}}],\"source\":true,\"script_fields\":{\"distance_from\":{\"script\":{\"source\":\"doc['latlon'].arcDistance(params.lat,params.lon) * 0.001\",\"lang\":\"painless\",\"params\":{\"lat\":{{lat}},\"lon\":{{lon}}}}}}}"
   }
 }
+```
+
+
 
 GET test_index/_search/template
 {
@@ -583,9 +601,6 @@ GET test_index/_search/template
   }
 }
 
-# Event -- Suggestion
-
-# Greater than now
 # Geo distance filter: 500mi
 POST _scripts/event-suggestion
 {
@@ -634,18 +649,6 @@ GET test_index/_search/template
 # What problem are we solving?
 # What is the technical philosophy?
 
-Go back to feature branches
-/Bring back the Venue icon
-
-
-# Install Steps
-
-# Scrape data:
-# Import scraped data to database:
-# Install Elasticsearch templates: elasticsearch:installTemplates
-# Import events into Scout: php artisan scout:import "App\Event"
-# Import venues into Scout: php artisan scout:import "App\Venue"
-
 # Quick Snippets
 
 Ping Elasticsearch;
@@ -662,3 +665,17 @@ Open a terminal for a container (note; only if container has bash);
 docker exec -it [CONTAINRER_NAME] bash
 ```
 
+## 2. App: Start
+
+Command; `docker-compose up`
+
+What this does is, create a series of service that afford the end use an ease of event and venue discovery. Our services are;
+
+- Web: SSL, web root, web config, exposing ports 80, and 443
+- PHP: Complies PHP 
+
+  # http://localhost:9200/_cat/health
+  # Ref:
+  #   https://github.com/nodejs/docker-node/issues/533#issuecomment-333867800
+  #   https://github.com/vcarreira/docker-laravel/blob/master/docker-compose.yml
+  # Is redis working? Currently its bundled with the php image from that guy.
