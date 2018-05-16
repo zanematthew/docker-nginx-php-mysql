@@ -1,0 +1,22 @@
+version: '3'
+services:
+  kibana:
+    image: docker.elastic.co/kibana/kibana:6.2.2
+    container_name: ${APP_NAME}_kibana
+    volumes:
+      - ./services/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+    networks:
+      - ${APP_NAME}_network
+  myadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: ${APP_NAME}_phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=${MYSQL_HOST}
+    restart: always
+    networks:
+      - ${APP_NAME}_network
