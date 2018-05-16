@@ -122,7 +122,7 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@make npm arg="install"
 	@echo "+-----------------------------------------------+"
-	@echo "| Turning on dev                                |"
+	@echo "| Compile assests for local development         |"
 	@echo "+-----------------------------------------------+"
 	@make npm arg="run dev"
 	@echo "+-----------------------------------------------+"
@@ -136,7 +136,7 @@ build-dev: ## Build the development environment.
 
 build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
-	@echo "| Building development ready environment        |"
+	@echo "| Building production ready environment         |"
 	@echo "+-----------------------------------------------+"
 	@docker-compose build
 	@echo "+-----------------------------------------------+"
@@ -147,7 +147,7 @@ build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing server-side dependencies           |"
 	@echo "+-----------------------------------------------+"
-	@make composer arg="install"
+	@make composer arg="install --no-dev --optimize-autoloader"
 	@echo "+-----------------------------------------------+"
 	@echo "| Verifying coding standards                    |"
 	@echo "+-----------------------------------------------+"
@@ -174,7 +174,7 @@ build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
 	@make npm arg="install --production"
 	@echo "+-----------------------------------------------+"
-	@echo "| Turning on dev                                |"
+	@echo "| Compile assets for production                 |"
 	@echo "+-----------------------------------------------+"
 	@make npm arg="run production"
 	@echo "Done."
