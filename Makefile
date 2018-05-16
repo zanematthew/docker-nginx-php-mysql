@@ -256,10 +256,10 @@ resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)
 
 start-dev-admin:
-	@docker-compose -f docker-compose.yml -f docker-compose.admin.yml up -d
+	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml up -d
 
 stop-dev-admin:
-	@docker-compose -f docker-compose.yml -f docker-compose.admin.yml down
+	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml down
 
 test: ## Test the codebase and generate a code coverage report.
 	@echo "Performing testing..."

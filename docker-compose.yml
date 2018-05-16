@@ -4,9 +4,6 @@ services:
     build:
       context: ./services/composer
     container_name: ${APP_NAME}_composer
-    volumes:
-      - "./src:/app"
-      - "./services/composer/cache:/root/.composer"
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
     container_name: ${APP_NAME}_elasticsearch
@@ -17,9 +14,6 @@ services:
       memlock:
         soft: -1
         hard: -1
-    volumes:
-      - "./services/elasticsearch/esdata1:/usr/share/elasticsearch/data"
-      - "./services/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml"
     ports:
       - 9200:9200
     networks:
@@ -30,15 +24,6 @@ services:
     restart: always
     env_file:
       - ".env"
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    ports:
-      - "8989:3306"
-    volumes:
-      - "./services/mysqldb/data/db/mysql:/var/lib/mysql"
     networks:
       - ${APP_NAME}_network
   node:
@@ -50,9 +35,6 @@ services:
       context: ./services/php-fpm
     container_name: ${APP_NAME}_php
     restart: always
-    volumes:
-      - "./services/web/etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
-      - "./src:/var/www/html"
     networks:
       - ${APP_NAME}_network
   redis:
@@ -60,8 +42,6 @@ services:
     container_name: ${APP_NAME}_redis
     ports:
       - "6379:6379"
-    volumes:
-      - "./services/redis/data:/data"
     restart: always
     networks:
       - ${APP_NAME}_network
@@ -73,16 +53,6 @@ services:
       - redis
       - mysqldb
       - elasticsearch
-    volumes:
-      - "./services/web/etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
-      - "./services/web/etc/ssl:/etc/ssl"
-      - "./src:/var/www/html"
-      - "./services/web/etc/nginx/default.template.conf:/etc/nginx/conf.d/default.template"
-    ports:
-      - "44300:443"
-    environment:
-      - NGINX_HOST=${NGINX_HOST}
-    command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
     restart: always
     networks:
       - ${APP_NAME}_network
