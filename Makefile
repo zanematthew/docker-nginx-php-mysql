@@ -22,8 +22,6 @@
 #
 .PHONY: *
 
-include .env
-
 ####
 # References:
 # 	https://php.earth/docs/interop/make
@@ -79,6 +77,7 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 # 	@make resetOwner
 
 build:
+	@echo "Building custom images..."
 	@docker-compose build php
 	@docker-compose build composer
 
@@ -90,7 +89,7 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@echo "| Starting services                             |"
 	@echo "+-----------------------------------------------+"
-	@docker-compose up -d
+	@make start-dev-admin
 	# Pull the repo
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing server-side dependencies           |"
@@ -255,10 +254,10 @@ reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-
 resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)
 
-start-dev-admin:
+start-dev-admin: ## Start the docker services for development using multiple compose files.
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml up -d
 
-stop-dev-admin:
+stop-dev-admin: ## Stop the docker services for development using multiple compose files.
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml down
 
 test: ## Test the codebase and generate a code coverage report.

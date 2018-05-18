@@ -21,7 +21,6 @@ services:
   mysqldb:
     image: mysql
     container_name: ${MYSQL_HOST}
-    restart: always
     env_file:
       - ".env"
     networks:
@@ -34,7 +33,6 @@ services:
     build:
       context: ./services/php-fpm
     container_name: ${APP_NAME}_php
-    restart: always
     networks:
       - ${APP_NAME}_network
   redis:
@@ -42,7 +40,6 @@ services:
     container_name: ${APP_NAME}_redis
     ports:
       - "6379:6379"
-    restart: always
     networks:
       - ${APP_NAME}_network
   web:
@@ -53,11 +50,10 @@ services:
       - redis
       - mysqldb
       - elasticsearch
-    restart: always
+    environment:
+      - NGINX_HOST=${NGINX_HOST}
+    command: /bin/sh -c "envsubst '$$NGINX_HOST' < /etc/nginx/conf.d/default.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
     networks:
       - ${APP_NAME}_network
-volumes:
-  esdata1:
-    driver: local
 networks:
   mybmx_network:
