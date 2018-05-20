@@ -158,7 +158,7 @@ build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing database                           |"
 	@echo "+-----------------------------------------------+"
-	@make artisan arg="migrate"
+	@make artisan arg="migrate --database=migration"
 	# @make artisan arg="passport:install"
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing Elasticsearch search index pattern |"
