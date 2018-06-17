@@ -1,0 +1,12 @@
+version: '3'
+services:
+  # @todo need a production configuration
+  elasticsearch:
+  php:
+    restart: always
+  redis:
+    restart: always
+  web:
+    restart: always
+    ports:
+      - "443:443"

@@ -91,6 +91,7 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@make start-dev-admin
 	# Pull the repo
+	@make pull-repo
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing server-side dependencies           |"
 	@echo "+-----------------------------------------------+"
@@ -148,14 +149,6 @@ build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
 	@make composer arg="install --no-dev --optimize-autoloader"
 	@echo "+-----------------------------------------------+"
-	@echo "| Verifying coding standards                    |"
-	@echo "+-----------------------------------------------+"
-	@make phpcs
-	@echo "+-----------------------------------------------+"
-	@echo "| Verifying test                                |"
-	@echo "+-----------------------------------------------+"
-	@make test
-	@echo "+-----------------------------------------------+"
 	@echo "| Installing database                           |"
 	@echo "+-----------------------------------------------+"
 	@make artisan arg="migrate --database=migration"
@@ -195,8 +188,7 @@ install: ## Install; build images(?), ssl, dependencies
 mysql-dump: ## Export all databases to the path/file defined in the .env file.
 	@echo "Exporting all databases to: $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)..."
 	@mkdir -p $(MYSQL_DUMPS_DIR)
-	@docker exec $(shell docker-compose ps -q mysqldb) \
-		mysqldump --all-databases \
+	@docker exec $(shell docker-compose ps -q mysqldb) \		mysqldump --all-databases \
 		-u"$(MYSQL_ROOT_USER)" \
 		-p"$(MYSQL_ROOT_PASSWORD)" \
 		> $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE) \
@@ -242,6 +234,9 @@ phpmd: ## Check our code for messy-ness.
 		app/ \
 		text \
 		cleancode,codesize,controversial,design,naming,unusedcode
+
+pull-repo: ## Pull the latest repo.
+	@git clone git@github.com:zanematthew/docker-nginx-php-mysql.git src/
 
 reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
 	@rm -Rf services/mysqldb/data
