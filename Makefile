@@ -235,8 +235,19 @@ phpmd: ## Check our code for messy-ness.
 		text \
 		cleancode,codesize,controversial,design,naming,unusedcode
 
+#
+# @todo rename...
+# There should be a single command for;
+# 	Initial build process
+# 	continue working
+# 	delete entire environment
+#
+# @todo git...
+# 	which service has git?
+# 	Do it like compose, just have a container that starts/stops for git?
+#
 pull-repo: ## Pull the latest repo.
-	@git clone git@github.com:zanematthew/docker-nginx-php-mysql.git src/
+	@docker-compose # From the docker container pull the repo
 
 reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
 	@rm -Rf services/mysqldb/data

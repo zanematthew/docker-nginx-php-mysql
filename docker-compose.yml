@@ -18,6 +18,9 @@ services:
       - 9200:9200
     networks:
       - ${APP_NAME}_network
+  git:
+    image: alpine/git
+    container_name: ${APP_NAME}_git
   node:
     build:
       context: ./services/node
