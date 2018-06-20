@@ -26,8 +26,10 @@ include .env
 
 test_report_url         = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/phpunit/index.html
 app_url                 = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/
+app_src_dir             = $(shell pwd)/$(APP_SRC_DIR)
 mysql_admin_url         = http://$(NGINX_HOST):$(NON_SSL_PORT)/
 elasticsearch_admin_url = http://$(NGINX_HOST):5601/
+repo_ssh_url            = git@github.com:zanematthew/docker-nginx-php-mysql.git
 
 artisan: ## Laravel's artisan command.
 	@docker-compose exec php \
@@ -60,7 +62,7 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "Redis Password      : "
 	@echo "Redis Port          : 6379"
 	@echo "---"
-	@echo "App source Dir      : $(shell pwd)/$(APP_SRC_DIR)/"
+	@echo "App source Dir      : $(app_src_dir)"
 
 # apidoc:
 # 	@docker-compose exec -T php ./services/web/src/app/vendor/bin/apigen generate app/src --destination app/doc
@@ -80,8 +82,8 @@ build-dev: ## Build the development environment.
 	@echo "| Starting services                             |"
 	@echo "+-----------------------------------------------+"
 	@make start-dev-admin
-	# Pull the repo
-	# @make pull-repo
+	# clone the repo
+	# @make clone-repo
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing server-side dependencies           |"
 	@echo "+-----------------------------------------------+"
@@ -133,7 +135,7 @@ build-prod: ## Build production ready app.
 	@echo "| Starting services                             |"
 	@echo "+-----------------------------------------------+"
 	@docker-compose up -d
-	# Pull the repo
+	# clone the repo
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing server-side dependencies           |"
 	@echo "+-----------------------------------------------+"
@@ -253,12 +255,11 @@ phpmd: ## Check our code for messy-ness.
 # 	continue working
 # 	delete entire environment
 #
-# @todo git...
-# 	which service has git?
-# 	Do it like compose, just have a container that starts/stops for git?
-#
-pull-repo: ## Pull the latest repo.
-	# @docker-compose
+clone-repo: ## Clone the latest repo.
+	@docker run --rm \
+		-v $(shell pwd):/git \
+		-v ${HOME}/.ssh:/root/.ssh \
+		alpine/git clone $(repo_ssh_url) $(APP_SRC_DIR)
 
 reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
 	@rm -Rf services/mysqldb/data
