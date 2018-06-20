@@ -22,23 +22,12 @@
 #
 .PHONY: *
 
-####
-# References:
-# 	https://php.earth/docs/interop/make
-# 	https://docs.docker.com/engine/reference/run/
-# 	https://docs.docker.com/compose/reference/up/
-# 	https://docs.docker.com/compose/reference/down/
-# 	https://docs.docker.com/compose/reference/exec/
-#
-#
-# https://www.client9.com/self-documenting-makefiles/
-help:
-	@echo "\033[33mUsage:\033[0m\n  make [target] [arg=\"val\"...]\n\n\033[33mTargets:\033[0m"
-	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
-	printf "  \033[36m%-30s\033[0m %s\n", $$1, $$NF \
-	}' $(MAKEFILE_LIST)
-
 include .env
+
+test_report_url         = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/phpunit/index.html
+app_url                 = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/
+mysql_admin_url         = http://$(NGINX_HOST):$(NON_SSL_PORT)/
+elasticsearch_admin_url = http://$(NGINX_HOST):5601/
 
 artisan: ## Laravel's artisan command.
 	@docker-compose exec php \
@@ -47,22 +36,23 @@ artisan: ## Laravel's artisan command.
 app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "App Name            : $(APP_NAME)"
 	@echo "---"
-	@echo "APP URL             : https://$(NGINX_HOST):44300/"
-	@echo "MySQL Dashboard     : http://$(NGINX_HOST):8080/"
-	@echo "Kibana Dasboard     : http://$(NGINX_HOST):5601/"
-	@echo "PHPUnit Report      : https://${NGINX_HOST}:44300/phpunit/index.html"
+	@echo "APP URL             : $(app_url)"
+	@echo "MySQL Dashboard     : $(mysql_admin_url)"
+	@echo "Kibana Dasboard     : $(elasticsearch_admin_url)"
+	@echo "PHPUnit Report      : $(test_report_url)"
 	@echo "---"
 	@echo "Host                : $(NGINX_HOST)"
 	@echo "---"
 	@echo "PHP Version         : $(PHP_VERSION)"
 	@echo "---"
 	@echo "MySQL Host          : $(MYSQL_HOST)"
+	@echo "MySQL Port          : $(MYSQL_PORT)"
 	@echo "MySQL DB            : $(MYSQL_DATABASE)"
 	@echo "MySQL Root User     : $(MYSQL_ROOT_USER)"
 	@echo "MySQL Root Password : $(MYSQL_ROOT_PASSWORD)"
 	@echo "MySQL User          : $(MYSQL_USER)"
 	@echo "MySQL Password      : $(MYSQL_PASSWORD)"
-	@echo "MySQL Dumps         : $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)"
+	@echo "MySQL Dumps         : $(shell pwd)/$(MYSQL_DUMPS_DIR)$(MYSQL_DUMPS_FILE)"
 	@echo "---"
 	@echo "Elasticsearch       : http://elasticsearch:9200"
 	@echo "---"
@@ -70,7 +60,7 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "Redis Password      : "
 	@echo "Redis Port          : 6379"
 	@echo "---"
-	@echo "App source Dir      : $(APP_SRC_DIR)"
+	@echo "App source Dir      : $(shell pwd)/$(APP_SRC_DIR)/"
 
 # apidoc:
 # 	@docker-compose exec -T php ./services/web/src/app/vendor/bin/apigen generate app/src --destination app/doc
@@ -186,6 +176,22 @@ gen-certs:
 	-v $(shell pwd)/services/web/etc/ssl:/certificates \
 	-e "SERVER=$(NGINX_HOST)" jacoelho/generate-certificate
 
+####
+# References:
+# 	https://php.earth/docs/interop/make
+# 	https://docs.docker.com/engine/reference/run/
+# 	https://docs.docker.com/compose/reference/up/
+# 	https://docs.docker.com/compose/reference/down/
+# 	https://docs.docker.com/compose/reference/exec/
+#
+#
+# https://www.client9.com/self-documenting-makefiles/
+help:
+	@echo "\033[33mUsage:\033[0m\n  make [target] [arg=\"val\"...]\n\n\033[33mTargets:\033[0m"
+	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
+	printf "  \033[36m%-30s\033[0m %s\n", $$1, $$NF \
+	}' $(MAKEFILE_LIST)
+
 install: ## Install; build images(?), ssl, dependencies
 	@echo "TODO"
 
@@ -252,7 +258,7 @@ phpmd: ## Check our code for messy-ness.
 # 	Do it like compose, just have a container that starts/stops for git?
 #
 pull-repo: ## Pull the latest repo.
-	# @docker-compose # From the docker container pull the repo
+	# @docker-compose
 
 reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
 	@rm -Rf services/mysqldb/data
@@ -266,7 +272,6 @@ resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)
 
 start-dev-admin: ## Start the docker services for development using multiple compose files.
-	@build-dev
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml up -d
 
 stop-dev-admin: ## Stop the docker services for development using multiple compose files.
@@ -279,4 +284,4 @@ test: ## Test the codebase and generate a code coverage report.
 		--colors=always \
 		--configuration ./
 	@make resetOwner
-	@echo "Report available at ${NGINX_HOST}/phpunit"
+	@echo "Report available at: $(test_report)"
