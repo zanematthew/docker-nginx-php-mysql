@@ -91,7 +91,7 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@make start-dev-admin
 	# Pull the repo
-	@make pull-repo
+	# @make pull-repo
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing server-side dependencies           |"
 	@echo "+-----------------------------------------------+"
@@ -103,12 +103,12 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@echo "| Verifying test                                |"
 	@echo "+-----------------------------------------------+"
-	# @make test
+	@make test
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing database                           |"
 	@echo "+-----------------------------------------------+"
 	@make artisan arg="migrate"
-	# @make artisan arg="passport:install"
+	@make artisan arg="passport:install"
 	@echo "+-----------------------------------------------+"
 	@echo "| Installing Elasticsearch search index pattern |"
 	@echo "+-----------------------------------------------+"
@@ -171,6 +171,10 @@ build-prod: ## Build production ready app.
 	@make npm arg="run production"
 	@echo "Done."
 
+cli: ## Connect to the terminal, starting all services, and (if not built) build development environment.
+	@start-dev-admin
+	@docker-compose exec php bash
+
 composer: ## Composer, for PHP.
 	@docker run --rm \
 		-v $(shell pwd)/src:/app \
@@ -188,7 +192,8 @@ install: ## Install; build images(?), ssl, dependencies
 mysql-dump: ## Export all databases to the path/file defined in the .env file.
 	@echo "Exporting all databases to: $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)..."
 	@mkdir -p $(MYSQL_DUMPS_DIR)
-	@docker exec $(shell docker-compose ps -q mysqldb) \		mysqldump --all-databases \
+	@docker exec $(shell docker-compose ps -q mysqldb) \
+		mysqldump --all-databases \
 		-u"$(MYSQL_ROOT_USER)" \
 		-p"$(MYSQL_ROOT_PASSWORD)" \
 		> $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE) \
@@ -247,7 +252,7 @@ phpmd: ## Check our code for messy-ness.
 # 	Do it like compose, just have a container that starts/stops for git?
 #
 pull-repo: ## Pull the latest repo.
-	@docker-compose # From the docker container pull the repo
+	# @docker-compose # From the docker container pull the repo
 
 reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
 	@rm -Rf services/mysqldb/data
@@ -261,6 +266,7 @@ resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)
 
 start-dev-admin: ## Start the docker services for development using multiple compose files.
+	@build-dev
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml up -d
 
 stop-dev-admin: ## Stop the docker services for development using multiple compose files.
