@@ -18,3 +18,5 @@ services/redis/data
 
 data/db/
 src/
+
+.env
