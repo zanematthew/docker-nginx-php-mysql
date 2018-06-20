@@ -172,7 +172,7 @@ build-prod: ## Build production ready app.
 	@echo "Done."
 
 cli: ## Connect to the terminal, starting all services, and (if not built) build development environment.
-	@start-dev-admin
+	@make start-dev-admin
 	@docker-compose exec php bash
 
 composer: ## Composer, for PHP.
