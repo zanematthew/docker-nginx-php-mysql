@@ -30,6 +30,7 @@ app_src_dir             = $(shell pwd)/$(APP_SRC_DIR)
 mysql_admin_url         = http://$(NGINX_HOST):$(NON_SSL_PORT)/
 elasticsearch_admin_url = http://$(NGINX_HOST):5601/
 repo_ssh_url            = git@github.com:zanematthew/docker-nginx-php-mysql.git
+app_php_docs            = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/documentation/app/index.html
 
 artisan: ## Laravel's artisan command.
 	@docker-compose exec php \
@@ -63,6 +64,8 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "Redis Port          : 6379"
 	@echo "---"
 	@echo "App source Dir      : $(app_src_dir)"
+	@echo "---"
+	@echo "PHP Documentation   : $(app_php_docs)"
 
 # apidoc:
 # 	@docker-compose exec -T php ./services/web/src/app/vendor/bin/apigen generate app/src --destination app/doc
@@ -117,6 +120,7 @@ build-dev: ## Build the development environment.
 	@echo "| Compile assests for local development         |"
 	@echo "+-----------------------------------------------+"
 	@make npm arg="run dev"
+	@make build-documentation
 	@echo "+-----------------------------------------------+"
 	@echo "| Available commands                            |"
 	@echo "+-----------------------------------------------+"
@@ -125,6 +129,13 @@ build-dev: ## Build the development environment.
 	@echo "| Available Services:                           |"
 	@echo "+-----------------------------------------------+"
 	@make app-info
+
+build-documentation: ## Generic PHP Documentation
+	@echo "+-----------------------------------------------+"
+	@echo "| Building Documentation                        |"
+	@echo "+-----------------------------------------------+"
+	@docker pull phpdoc/phpdoc
+	@docker run --rm -v $(shell pwd)/src/:/data phpdoc/phpdoc
 
 build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
@@ -268,6 +279,8 @@ reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-
 	@rm -Rf $(MYSQL_DUMPS_DIR)/*
 	@rm -Rf services/web/etc/nginx/default.conf
 	@rm -Rf services/web/etc/ssl/*
+	# @todo remove images!
+	@docker image rm phpdoc/phpdoc
 
 resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)
