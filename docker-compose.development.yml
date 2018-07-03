@@ -1,9 +1,5 @@
 version: '3'
 services:
-  composer:
-    volumes:
-      - "./src:/app"
-      - "./services/composer/cache:/root/.composer"
   elasticsearch:
     volumes:
       - "./services/elasticsearch/esdata1:/usr/share/elasticsearch/data"

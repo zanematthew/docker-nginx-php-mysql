@@ -190,6 +190,14 @@ cli: ## Connect to the terminal, starting all services, and (if not built) build
 	@make start-dev-admin
 	@docker-compose exec php bash
 
+build-composer: ## Build the custom composer image.
+	@echo "--Building Composer, Tagged: $(APP_NAME)_composer--"
+	@docker build -t $(APP_NAME)_composer ./services/composer
+
+build-node: ## Node.
+	@echo "--Building Node--"
+	@docker pull node:9.11.1-alpine
+
 composer: ## Composer, for PHP.
 	@docker run --rm \
 		-v $(shell pwd)/src:/app \
@@ -201,6 +209,8 @@ gen-certs:
 	-v $(shell pwd)/services/web/etc/ssl:/certificates \
 	-e "SERVER=$(NGINX_HOST)" jacoelho/generate-certificate
 
+git: ## Git for vc.
+	@docker run --rm ${APP_NAME}_git
 ####
 # References:
 # 	https://php.earth/docs/interop/make
@@ -244,7 +254,7 @@ mysql-restore: ## Import all databases from the path/file defined in the .env fi
 npm:
 	@docker run --rm -v \
 		$(shell pwd)/src:/app \
-		$(APP_NAME)_node \
+		node \
 		sh -c "cd /app ; npm $(arg)"
 
 phpcbf: ## PHP Code Beautifier, "Code is poetry", Because we are lazy, automate it.
@@ -284,15 +294,21 @@ clone-repo: ## Clone the latest repo.
 		-v ${HOME}/.ssh:/root/.ssh \
 		alpine/git clone $(repo_ssh_url) $(APP_SRC_DIR)
 
-reset: ## Revert app to pre-install state, i.e., remove db, server-side & front-end dependencies, etc.
-	@rm -Rf services/mysqldb/data
-	@rm -Rf services/elasticsearch/esdata1/*
-	@rm -Rf services/redis/data
-	@rm -Rf $(MYSQL_DUMPS_DIR)/*
-	@rm -Rf services/web/etc/nginx/default.conf
-	@rm -Rf services/web/etc/ssl/*
-	# @todo remove images!
-	@docker image rm phpdoc/phpdoc
+remove-dev: ## Remove (delete) the entire app.
+	@make stop-dev-admin
+	# @echo "--Removing PHPDOC image--"
+	# @docker image rm phpdoc/phpdoc
+	@docker image rm $(APP_NAME)_composer
+	@docker image rm composer
+	@rm -rf services/composer/cache
+	@docker image rm alpine/git
+	@docker image rm node
+	# @rm -Rf services/mysqldb/data
+	# @rm -Rf services/elasticsearch/esdata1/*
+	# @rm -Rf services/redis/data
+	# @rm -Rf $(MYSQL_DUMPS_DIR)/*
+	# @rm -Rf services/web/etc/nginx/default.conf
+	# @rm -Rf services/web/etc/ssl/*
 
 resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)

@@ -1,9 +1,5 @@
 version: '3'
 services:
-  composer:
-    build:
-      context: ./services/composer
-    container_name: ${APP_NAME}_composer
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
     container_name: ${APP_NAME}_elasticsearch
@@ -18,13 +14,6 @@ services:
       - 9200:9200
     networks:
       - ${APP_NAME}_network
-  git:
-    image: alpine/git
-    container_name: ${APP_NAME}_git
-  node:
-    build:
-      context: ./services/node
-    container_name: ${APP_NAME}_node
   php:
     build:
       context: ./services/php-fpm
