@@ -29,6 +29,7 @@ services:
     volumes:
       - "./services/web/etc/php/php.ini:/usr/local/etc/php/conf.d/php.ini"
       - "./src:/var/www/html"
+      - "~/.ssh:/root/.ssh"
   redis:
     volumes:
       - "./services/redis/data:/data"

@@ -15,6 +15,7 @@ services/web/etc/nginx/default.conf
 services/mysqldb/data
 services/elasticsearch/esdata1
 services/redis/data
+services/composer/cache
 
 data/db/
 src/
