@@ -31,12 +31,16 @@ mysql_admin_url         = http://$(NGINX_HOST):$(NON_SSL_PORT)/
 elasticsearch_admin_url = http://$(NGINX_HOST):5601/
 repo_ssh_url            = git@github.com:zanematthew/docker-nginx-php-mysql.git
 app_php_docs            = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/documentation/app/index.html
+app_api_docs            = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/docs/index.html
 
 artisan: ## Laravel's artisan command.
 	@docker-compose exec php \
 	php artisan $(arg)
 
 app-info: ## Display info such as; URLs, DB connection, etc.
+	@echo "+-----------------------------------------------+"
+	@echo "| Application is now available.                 |"
+	@echo "+-----------------------------------------------+"
 	@echo "App Name            : $(APP_NAME)"
 	@echo "---"
 	@echo "APP URL             : $(app_url)"
@@ -65,7 +69,8 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "---"
 	@echo "App source Dir      : $(app_src_dir)"
 	@echo "---"
-	@echo "PHP Documentation   : $(app_php_docs)"
+	@echo "Documentation PHP  : $(app_php_docs)"
+	@echo "Documentation API  : $(app_api_docs)"
 
 # apidoc:
 # 	@docker-compose exec -T php ./services/web/src/app/vendor/bin/apigen generate app/src --destination app/doc
@@ -121,6 +126,7 @@ build-dev: ## Build the development environment.
 	@echo "+-----------------------------------------------+"
 	@make npm arg="run dev"
 	@make build-documentation
+	@make build-documentation-api
 	@echo "+-----------------------------------------------+"
 	@echo "| Available commands                            |"
 	@echo "+-----------------------------------------------+"
@@ -132,10 +138,16 @@ build-dev: ## Build the development environment.
 
 build-documentation: ## Generic PHP Documentation
 	@echo "+-----------------------------------------------+"
-	@echo "| Building Documentation                        |"
+	@echo "| Building PHP Documentation                    |"
 	@echo "+-----------------------------------------------+"
 	@docker pull phpdoc/phpdoc
 	@docker run --rm -v $(shell pwd)/src/:/data phpdoc/phpdoc
+
+build-documentation-api: ## API Documenation.
+	@echo "+-----------------------------------------------+"
+	@echo "| Building API Documentation                    |"
+	@echo "+-----------------------------------------------+"
+	@make artisan arg="api:generate --routePrefix='api/*'"
 
 build-prod: ## Build production ready app.
 	@echo "+-----------------------------------------------+"
@@ -287,15 +299,22 @@ resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 
 start-dev-admin: ## Start the docker services for development using multiple compose files.
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml up -d
+	@make app-info
 
 stop-dev-admin: ## Stop the docker services for development using multiple compose files.
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml down
 
-test: ## Test the codebase and generate a code coverage report.
-	@echo "Performing testing..."
+test-with-report: ## Test the codebase and generate a code coverage report.
+	@echo "Performing test..."
+	@echo "and generating report..."
 	@docker-compose exec -T \
 		php ./vendor/bin/phpunit \
 		--colors=always \
 		--configuration ./
 	@make resetOwner
 	@echo "Report available at: $(test_report)"
+
+test: ## Test the codebase.
+	@echo "Performing test..."
+	@docker-compose exec -T \
+		php ./vendor/bin/phpunit
