@@ -72,10 +72,6 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 	@echo "Documentation PHP  : $(app_php_docs)"
 	@echo "Documentation API  : $(app_api_docs)"
 
-# apidoc:
-# 	@docker-compose exec -T php ./services/web/src/app/vendor/bin/apigen generate app/src --destination app/doc
-# 	@make resetOwner
-
 init:
 	@echo "Building/pulling images..."
 	@docker-compose build
@@ -211,13 +207,6 @@ cli: ## Connect to the terminal, starting all services, and (if not built) build
 	@make start-dev-admin
 	@docker-compose exec php bash
 
-#
-# @todo rename...
-# There should be a single command for;
-# 	Initial build process
-# 	continue working
-# 	delete entire environment
-#
 clone-repo: ## Clone the latest repo.
 	@docker run --rm \
 		-v $(shell pwd):/git \
