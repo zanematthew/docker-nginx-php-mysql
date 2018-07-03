@@ -29,7 +29,7 @@ app_url                 = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/
 app_src_dir             = $(shell pwd)/$(APP_SRC_DIR)
 mysql_admin_url         = http://$(NGINX_HOST):$(NON_SSL_PORT)/
 elasticsearch_admin_url = http://$(NGINX_HOST):5601/
-repo_ssh_url            = git@github.com:zanematthew/docker-nginx-php-mysql.git
+repo_ssh_url            = git@labs.zanematthew.com/mybmx.events.git
 app_php_docs            = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/documentation/app/index.html
 app_api_docs            = $(WEB_PROTOCOL)$(NGINX_HOST):$(SSL_PORT)/docs/index.html
 
@@ -76,16 +76,37 @@ app-info: ## Display info such as; URLs, DB connection, etc.
 # 	@docker-compose exec -T php ./services/web/src/app/vendor/bin/apigen generate app/src --destination app/doc
 # 	@make resetOwner
 
-build:
-	@echo "Building custom images..."
-	@docker-compose build php
-	@docker-compose build composer
+init:
+	@echo "Building/pulling images..."
+	@docker-compose build
+	@docker build -t $(APP_NAME)_composer ./services/composer
+	@docker pull node:9.11.1-alpine
+
+remove-image: ## Remove (delete) the entire app.
+	@make stop-dev-admin
+	@docker image rm phpdoc/phpdoc
+	@docker image rm $(APP_NAME)_composer
+	@docker image rm composer
+	@docker image rm alpine/git
+	@docker image rm node
+	@docker image rm $(APP_NAME)_php
+	@docker image rm docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+	@docker image rm redis
+	@docker image rm nginx:alpine
+	@docker image rm mysql
+	@docker image rm docker.elastic.co/kibana/kibana:6.2.2
+	@docker image rm phpmyadmin/phpmyadmin
+
+# @TODO remove foldesr
+# @rm -rf services/composer/cache
+# @rm -Rf services/mysqldb/data
+# @rm -Rf services/elasticsearch/esdata1/*
+# @rm -Rf services/redis/data
+# @rm -Rf $(MYSQL_DUMPS_DIR)/*
+# @rm -Rf services/web/etc/nginx/default.conf
+# @rm -Rf services/web/etc/ssl/*
 
 build-dev: ## Build the development environment.
-	@echo "+-----------------------------------------------+"
-	@echo "| Building development ready environment        |"
-	@echo "+-----------------------------------------------+"
-	@docker-compose build
 	@echo "+-----------------------------------------------+"
 	@echo "| Starting services                             |"
 	@echo "+-----------------------------------------------+"
@@ -190,13 +211,18 @@ cli: ## Connect to the terminal, starting all services, and (if not built) build
 	@make start-dev-admin
 	@docker-compose exec php bash
 
-build-composer: ## Build the custom composer image.
-	@echo "--Building Composer, Tagged: $(APP_NAME)_composer--"
-	@docker build -t $(APP_NAME)_composer ./services/composer
-
-build-node: ## Node.
-	@echo "--Building Node--"
-	@docker pull node:9.11.1-alpine
+#
+# @todo rename...
+# There should be a single command for;
+# 	Initial build process
+# 	continue working
+# 	delete entire environment
+#
+clone-repo: ## Clone the latest repo.
+	@docker run --rm \
+		-v $(shell pwd):/git \
+		-v ${HOME}/.ssh:/root/.ssh \
+		alpine/git clone $(repo_ssh_url) $(APP_SRC_DIR)
 
 composer: ## Composer, for PHP.
 	@docker run --rm \
@@ -211,6 +237,7 @@ gen-certs:
 
 git: ## Git for vc.
 	@docker run --rm ${APP_NAME}_git
+
 ####
 # References:
 # 	https://php.earth/docs/interop/make
@@ -226,9 +253,6 @@ help:
 	@awk -F ':|##' '/^[^\t].+?:.*?##/ {\
 	printf "  \033[36m%-30s\033[0m %s\n", $$1, $$NF \
 	}' $(MAKEFILE_LIST)
-
-install: ## Install; build images(?), ssl, dependencies
-	@echo "TODO"
 
 mysql-dump: ## Export all databases to the path/file defined in the .env file.
 	@echo "Exporting all databases to: $(MYSQL_DUMPS_DIR)/$(MYSQL_DUMPS_FILE)..."
@@ -281,41 +305,11 @@ phpmd: ## Check our code for messy-ness.
 		text \
 		cleancode,codesize,controversial,design,naming,unusedcode
 
-#
-# @todo rename...
-# There should be a single command for;
-# 	Initial build process
-# 	continue working
-# 	delete entire environment
-#
-clone-repo: ## Clone the latest repo.
-	@docker run --rm \
-		-v $(shell pwd):/git \
-		-v ${HOME}/.ssh:/root/.ssh \
-		alpine/git clone $(repo_ssh_url) $(APP_SRC_DIR)
-
-remove-dev: ## Remove (delete) the entire app.
-	@make stop-dev-admin
-	# @echo "--Removing PHPDOC image--"
-	# @docker image rm phpdoc/phpdoc
-	@docker image rm $(APP_NAME)_composer
-	@docker image rm composer
-	@rm -rf services/composer/cache
-	@docker image rm alpine/git
-	@docker image rm node
-	# @rm -Rf services/mysqldb/data
-	# @rm -Rf services/elasticsearch/esdata1/*
-	# @rm -Rf services/redis/data
-	# @rm -Rf $(MYSQL_DUMPS_DIR)/*
-	# @rm -Rf services/web/etc/nginx/default.conf
-	# @rm -Rf services/web/etc/ssl/*
-
 resetOwner: ## Reset the owner and group for /etc/ssl, and /services/web/src
 	@$(shell chown -Rf $(SUDO_USER):$(shell id -g -n $(SUDO_USER)) $(MYSQL_DUMPS_DIR) "$(shell pwd)/etc/ssl" "$(shell pwd)/services/web" 2> /dev/null)
 
 start-dev-admin: ## Start the docker services for development using multiple compose files.
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml up -d
-	@make app-info
 
 stop-dev-admin: ## Stop the docker services for development using multiple compose files.
 	@docker-compose -f docker-compose.yml -f docker-compose.development.yml -f docker-compose.admin.yml down
